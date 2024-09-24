@@ -89,7 +89,7 @@
 /*     */     } 
 /*     */     
 /*  91 */     BaseObjectManager<T> manager = Context.getManager(this.baseClass);
-/*  92 */     manager.addItem((BaseModel)entity);
+/*  92 */     manager.addItem((T) entity);
 /*  93 */     LogAction.create(getUserId(), (BaseModel)entity);
 /*     */     
 /*  95 */     Context.getDataManager().linkObject(User.class, getUserId(), this.baseClass, entity.getId(), true);
@@ -124,7 +124,7 @@
 /*     */     } 
 /* 125 */     Context.getPermissionsManager().checkPermission(this.baseClass, getUserId(), entity.getId());
 /*     */     
-/* 127 */     Context.getManager(this.baseClass).updateItem((BaseModel)entity);
+/* 127 */     Context.getManager(this.baseClass).updateItem((T) entity);
 /* 128 */     LogAction.edit(getUserId(), (BaseModel)entity);
 /*     */     
 /* 130 */     if (this.baseClass.equals(Group.class) || this.baseClass.equals(Device.class)) {

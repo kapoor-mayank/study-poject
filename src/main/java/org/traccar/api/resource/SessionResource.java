@@ -16,7 +16,7 @@
 /*     */ import javax.ws.rs.Produces;
 /*     */ import javax.ws.rs.QueryParam;
 /*     */ import javax.ws.rs.WebApplicationException;
-/*     */ import javax.ws.rs.core.Context;
+/*     */ //import javax.ws.rs.core.Context;
 /*     */ import javax.ws.rs.core.Response;
 /*     */ import org.traccar.Context;
 /*     */ import org.traccar.api.BaseResource;
@@ -50,7 +50,7 @@
 /*     */   public static final String USER_ID_KEY = "userId";
 /*     */   public static final String USER_COOKIE_KEY = "user";
 /*     */   public static final String PASS_COOKIE_KEY = "password";
-/*     */   @Context
+/*     */   @javax.ws.rs.core.Context
 /*     */   private HttpServletRequest request;
 /*     */   
 /*     */   @PermitAll

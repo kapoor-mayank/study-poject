@@ -1621,7 +1621,7 @@
 /* 1621 */         if (result instanceof Position) {
 /* 1622 */           ((Position)result).set("type", type);
 /*      */         } else {
-/* 1624 */           for (Position p : result) {
+/* 1624 */           for (Position p : (Iterable<? extends Position>) result) {
 /* 1625 */             p.set("type", type);
 /*      */           }
 /*      */         } 

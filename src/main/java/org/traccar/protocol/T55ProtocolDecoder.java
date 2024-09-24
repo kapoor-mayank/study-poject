@@ -2,7 +2,8 @@
 /*     */ 
 /*     */ import io.netty.channel.Channel;
 /*     */ import java.net.SocketAddress;
-/*     */ import java.util.Date;
+/*     */ import java.nio.channels.DatagramChannel;
+import java.util.Date;
 /*     */ import java.util.regex.Pattern;
 /*     */ import org.traccar.BaseProtocolDecoder;
 /*     */ import org.traccar.Context;
@@ -129,7 +130,7 @@
 /*     */   private static final Pattern PATTERN_GPRMA = (new PatternBuilder()).text("$GPRMA,").expression("([AV]),").number("(dd)(dd.d+),").expression("([NS]),").number("(ddd)(dd.d+),").expression("([EW]),,,").number("(d+.?d*)?,").number("(d+.?d*)?,").any().compile();
 /*     */   
 /*     */   private Position decodeGprmc(DeviceSession deviceSession, String sentence, SocketAddress remoteAddress, Channel channel) {
-/* 132 */     if (deviceSession != null && channel != null && !(channel instanceof java.nio.channels.DatagramChannel)) {
+/* 132 */     if (deviceSession != null && channel != null && !(channel instanceof DatagramChannel)) {
 /* 133 */       if (Context.getIdentityManager().lookupAttributeBoolean(deviceSession
 /* 134 */           .getDeviceId(), getProtocolName() + ".ack", false, true)) {
 /* 135 */         channel.writeAndFlush(new NetworkMessage("OK1\r\n", remoteAddress));
@@ -338,7 +339,7 @@
 /* 338 */     { getDeviceSession(channel, remoteAddress, new String[] { sentence.substring(5) }); }
 /* 339 */     else if (sentence.startsWith("$IMEI"))
 /* 340 */     { getDeviceSession(channel, remoteAddress, new String[] { sentence.substring(6) }); }
-/* 341 */     else { DeviceSession deviceSession; if (sentence.startsWith("$GPFID"))
+/* 341 */     else { DeviceSession deviceSession = null; if (sentence.startsWith("$GPFID"))
 /* 342 */       { deviceSession = getDeviceSession(channel, remoteAddress, new String[] { sentence.substring(7) });
 /* 343 */         if (deviceSession != null && this.position != null) {
 /* 344 */           Position position = this.position;

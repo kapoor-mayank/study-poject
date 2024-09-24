@@ -50,16 +50,16 @@
 /*     */ 
 /*     */   
 /*     */   protected Object decode(Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
-/*     */     Object<Position> result;
+/*     */     Object result;
 /*  54 */     FullHttpRequest request = (FullHttpRequest)msg;
 /*     */     
 /*  56 */     JsonObject root = Json.createReader(new StringReader(request.content().toString(StandardCharsets.US_ASCII))).readObject();
 /*     */ 
 /*     */     
 /*  59 */     if (root.containsKey("device")) {
-/*  60 */       result = (Object<Position>)decodeEdge(channel, remoteAddress, root);
+/*  60 */       result = (Position)decodeEdge(channel, remoteAddress, root);
 /*     */     } else {
-/*  62 */       result = (Object<Position>)decodeTraditional(channel, remoteAddress, root);
+/*  62 */       result = (Position)decodeTraditional(channel, remoteAddress, root);
 /*     */     } 
 /*     */     
 /*  65 */     sendResponse(channel, (result != null) ? HttpResponseStatus.OK : HttpResponseStatus.BAD_REQUEST);

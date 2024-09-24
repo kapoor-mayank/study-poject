@@ -94,8 +94,9 @@
 /*     */       case 19:
 /*     */       case 20:
 /*     */       case 21:
-/*  97 */         key = "in" + (sensorId - 16 + 2);
-/*  98 */         position.set(key, Boolean.valueOf((sensorType > 0)));
+/*  97 */
+            Object key = "in" + (sensorId - 16 + 2);
+/*  98 */         position.set((String) key, Boolean.valueOf((sensorType > 0)));
 /*     */         return;
 /*     */       case 98:
 /* 101 */         position.set("doorFL", Boolean.valueOf((sensorType > 0)));
@@ -155,7 +156,7 @@
 /*     */       case 149:
 /*     */       case 150:
 /* 157 */         key = "out" + (sensorId - 148 + 1);
-/* 158 */         position.set(key, Boolean.valueOf((sensorType > 0)));
+/* 158 */         position.set((String) key, Boolean.valueOf((sensorType > 0)));
 /*     */         return;
 /*     */       case 154:
 /* 161 */         position.set("out4", Boolean.valueOf((sensorType > 0)));
@@ -210,7 +211,7 @@
 /*     */       case 12290:
 /*     */       case 12291:
 /* 212 */         key = "adc" + (12291 - sensorId + 3);
-/* 213 */         position.set(key, Double.valueOf(record.readUnsignedShortLE() * 0.001D));
+/* 213 */         position.set((String) key, Double.valueOf(record.readUnsignedShortLE() * 0.001D));
 /*     */         return;
 /*     */       case 12292:
 /* 216 */         position.set("battery", Double.valueOf(record.readUnsignedShortLE() * 0.001D));
@@ -250,7 +251,7 @@
 /*     */       case 20486:
 /*     */       case 20487:
 /* 252 */         key = "temp" + (sensorId - 20484 + 1);
-/* 253 */         position.set(key, Long.valueOf(record.readLongLE()));
+/* 253 */         position.set((String) key, Long.valueOf(record.readLongLE()));
 /*     */         return;
 /*     */       case 20493:
 /* 256 */         position.set("trailerId", String.valueOf(record.readLongLE()));
@@ -278,7 +279,7 @@
 /*     */       case 40985:
 /*     */       case 40986:
 /* 280 */         key = "temp" + (sensorId - 40983 + 1);
-/* 281 */         position.set(key, Float.valueOf(record.readFloatLE()));
+/* 281 */         position.set((String) key, Float.valueOf(record.readFloatLE()));
 /*     */         return;
 /*     */       case 40987:
 /* 284 */         position.set("fuelConsumption", Float.valueOf(record.readFloatLE()));

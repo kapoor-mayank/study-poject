@@ -81,7 +81,7 @@
 /*    */         }
 /*    */       } 
 /*    */     } 
-/* 84 */     Context.getUsersManager().addItem((BaseModel)entity);
+/* 84 */     Context.getUsersManager().addItem((User) entity);
 /* 85 */     LogAction.create(getUserId(), (BaseModel)entity);
 /* 86 */     if (Context.getPermissionsManager().getUserManager(getUserId())) {
 /* 87 */       Context.getDataManager().linkObject(User.class, getUserId(), ManagedUser.class, entity.getId(), true);

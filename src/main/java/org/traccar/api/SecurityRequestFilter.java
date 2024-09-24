@@ -9,7 +9,7 @@
 /*     */ import javax.ws.rs.container.ContainerRequestContext;
 /*     */ import javax.ws.rs.container.ContainerRequestFilter;
 /*     */ import javax.ws.rs.container.ResourceInfo;
-/*     */ import javax.ws.rs.core.Context;
+/*     */ //import javax.ws.rs.core.Context;
 /*     */ import javax.ws.rs.core.Response;
 /*     */ import javax.ws.rs.core.SecurityContext;
 /*     */ import org.slf4j.Logger;
@@ -58,9 +58,9 @@
 /*     */   
 /*     */   public static final String X_REQUESTED_WITH = "X-Requested-With";
 /*     */   public static final String XML_HTTP_REQUEST = "XMLHttpRequest";
-/*     */   @Context
+/*     */   @javax.ws.rs.core.Context
 /*     */   private HttpServletRequest request;
-/*     */   @Context
+/*     */   @javax.ws.rs.core.Context
 /*     */   private ResourceInfo resourceInfo;
 /*     */   
 /*     */   public void filter(ContainerRequestContext requestContext) {

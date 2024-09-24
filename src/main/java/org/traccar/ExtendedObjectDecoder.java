@@ -58,7 +58,7 @@
 /*    */       }
 /* 59 */       if (decodedMessage != null) {
 /* 60 */         if (decodedMessage instanceof java.util.Collection) {
-/* 61 */           for (Object o : decodedMessage) {
+/* 61 */           for (Object o : (Iterable<?>)decodedMessage) {
 /* 62 */             saveOriginal(o, originalMessage);
 /* 63 */             ctx.fireChannelRead(o);
 /*    */           } 

@@ -76,8 +76,9 @@
 /*    */         } else {
 /* 77 */           this.userItems = new ConcurrentHashMap<>();
 /*    */         } 
-/* 79 */         for (Permission permission : getDataManager().getPermissions((Class)User.class, getBaseClass())) {
-/* 80 */           getUserItems(permission.getOwnerId()).add(Long.valueOf(permission.getPropertyId()));
+/* 79 */         for (Object permission : getDataManager().getPermissions((Class)User.class, getBaseClass())) {
+                Permission permission1 = (Permission) permission;
+                /* 80 */           getUserItems(permission1.getOwnerId()).add(Long.valueOf(permission1.getPropertyId()));
 /*    */         }
 /* 82 */       } catch (SQLException|ClassNotFoundException error) {
 /* 83 */         LOGGER.warn("Error getting permissions", error);

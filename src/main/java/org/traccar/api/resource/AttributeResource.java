@@ -77,14 +77,14 @@
 /*    */   @POST
 /*    */   public Response add(Attribute entity) throws SQLException {
 /* 79 */     Context.getPermissionsManager().checkAdmin(getUserId());
-/* 80 */     return super.add((BaseModel)entity);
+/* 80 */     return super.add((Attribute) entity);
 /*    */   }
 /*    */   
 /*    */   @Path("{id}")
 /*    */   @PUT
 /*    */   public Response update(Attribute entity) throws SQLException {
 /* 86 */     Context.getPermissionsManager().checkAdmin(getUserId());
-/* 87 */     return super.update((BaseModel)entity);
+/* 87 */     return super.update((Attribute) entity);
 /*    */   }
 /*    */   
 /*    */   @Path("{id}")

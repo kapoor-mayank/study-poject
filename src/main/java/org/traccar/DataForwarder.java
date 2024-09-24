@@ -54,7 +54,7 @@
 /*    */   }
 /*    */   
 /*    */   public void forward(String uniqueId, byte[] data) {
-/* 57 */     if (((Integer)this.fails.getOrDefault(uniqueId, (V)Integer.valueOf(0))).intValue() >= 5)
+/* 57 */     if (((Integer)this.fails.getOrDefault(uniqueId, Integer.valueOf(0))).intValue() >= 5)
 /*    */       return;  try {
 /* 59 */       List<Info> infoList = this.infoMap.get(uniqueId);
 /* 60 */       if (infoList != null) {

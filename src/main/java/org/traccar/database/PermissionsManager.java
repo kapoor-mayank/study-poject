@@ -122,7 +122,8 @@
 /*     */     
 /*     */     try {
 /* 124 */       GroupTree groupTree = new GroupTree(Context.getGroupsManager().getItems(Context.getGroupsManager().getAllItems()), Context.getDeviceManager().getAllDevices());
-/* 125 */       for (Permission groupPermission : this.dataManager.getPermissions((Class)User.class, (Class)Group.class)) {
+/* 125 */       for (Object groupPermission1 : this.dataManager.getPermissions((Class)User.class, (Class)Group.class)) {
+            Permission groupPermission = (Permission) groupPermission1;
 /* 126 */         Set<Long> userGroupPermissions = getGroupPermissions(groupPermission.getOwnerId());
 /* 127 */         Set<Long> userDevicePermissions = getDevicePermissions(groupPermission.getOwnerId());
 /* 128 */         userGroupPermissions.add(Long.valueOf(groupPermission.getPropertyId()));
@@ -134,7 +135,8 @@
 /*     */         }
 /*     */       } 
 /*     */       
-/* 137 */       for (Permission devicePermission : this.dataManager.getPermissions((Class)User.class, (Class)Device.class)) {
+/* 137 */       for (Object devicePermission1 : this.dataManager.getPermissions((Class)User.class, (Class)Device.class)) {
+                    Permission devicePermission = (Permission)devicePermission1;
 /* 138 */         getDevicePermissions(devicePermission.getOwnerId()).add(Long.valueOf(devicePermission.getPropertyId()));
 /*     */       }
 /*     */       
