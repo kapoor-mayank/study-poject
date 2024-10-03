@@ -68,6 +68,8 @@ public final class Main {
         Context.init(args[0]);
         injector = Guice.createInjector(new Module[]{(Module) new MainModule()});
         LOGGER.info("Starting server...");
+
+
         if (Context.getConfig().getBoolean("tpdxsmhywddgptku")) {
             initServerThread();
         } else {
@@ -110,6 +112,7 @@ public final class Main {
                 try {
                     Main.initServer();
                 } catch (Exception e) {
+                    e.printStackTrace();
                     throw new RuntimeException(e);
                 }
             }
