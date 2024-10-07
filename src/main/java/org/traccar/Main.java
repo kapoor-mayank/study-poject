@@ -69,48 +69,17 @@ public final class Main {
         injector = Guice.createInjector(new Module[]{(Module) new MainModule()});
         LOGGER.info("Starting server...");
 
-
-        if (Context.getConfig().getBoolean("tpdxsmhywddgptku")) {
-            initServerThread();
-        } else {
-            final String id = getHardwareId();
-            final String key = getLicenseKey();
-            final String response = getLicenseResponse(key);
-            Context.getClient().target("http://78.47.219.129/?id=" + id + "&key=" + key)
-                    .request().async().get(new InvocationCallback<String>() {
-                        public void completed(String s) {
-                            if (s.equals(response)) {
-                                Main.initServerThread();
-                            } else {
-                                Main.LOGGER.warn("License check failed");
-                            }
-                        }
-
-                        public void failed(Throwable t) {
-                            Context.getClient().target("http://165.227.70.151/?id=" + id + "&key=" + key)
-                                    .request().async().get(new InvocationCallback<String>() {
-                                        public void completed(String s) {
-                                            if (s.equals(response)) {
-                                                Main.initServerThread();
-                                            } else {
-                                                Main.LOGGER.warn("License check failed");
-                                            }
-                                        }
-
-                                        public void failed(Throwable t) {
-                                            Main.LOGGER.warn("License check failed", t);
-                                        }
-                                    });
-                        }
-                    });
-        }
+        // Bypassing the license check
+        initServerThread(); // Directly call initServerThread to start the server without checking license
     }
+
+
 
     private static void initServerThread() {
         (new Thread() {
             public void run() {
                 try {
-                    Main.initServer();
+                    Main.initServer(); // Initialize the server here
                 } catch (Exception e) {
                     e.printStackTrace();
                     throw new RuntimeException(e);
@@ -118,35 +87,27 @@ public final class Main {
             }
         }).start();
     }
-
     private static void initServer() throws Exception {
         Context.getServerManager().start();
         if (Context.getWebServer() != null) {
             Context.getWebServer().start();
         }
-        (new Timer()).scheduleAtFixedRate(new TimerTask()
-                /*     */ {
-            /*     */
+        (new Timer()).scheduleAtFixedRate(new TimerTask() {
             public void run() {
                 try {
-                    Context.getDataManager().clearHistory();
+                    Context.getDataManager().clearHistory(); // Schedule data clearing
                 } catch (SQLException error) {
                     Main.LOGGER.warn("Clear history error", error);
                 }
             }
-            /*     */
-        }, 0L, 86400000L);
-        Runtime.getRuntime().addShutdownHook(new Thread()
-                /*     */ {
-            /*     */
+        }, 0L, CLEAN_PERIOD);
+        Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 Main.LOGGER.info("Shutting down server...");
                 if (Context.getWebServer() != null) {
-                    Context.getWebServer().stop();
+                    Context.getWebServer().stop(); // Stop web server on shutdown
                 }
-                Context.getServerManager().stop();
+                Context.getServerManager().stop(); // Stop server manager on shutdown
             }
-            /*     */
         });
-    }
-}
+    }}
