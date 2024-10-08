@@ -8,10 +8,12 @@
 /*     */ import java.util.Date;
 /*     */ import java.util.LinkedList;
 /*     */ import java.util.List;
-/*     */ import org.traccar.BaseProtocolDecoder;
-/*     */ import org.traccar.DeviceSession;
-/*     */ import org.traccar.NetworkMessage;
-/*     */ import org.traccar.Protocol;
+/*     */ import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.traccar.*;
+/*     */
+/*     */
+/*     */
 /*     */ import org.traccar.helper.BitUtil;
 /*     */ import org.traccar.helper.DateBuilder;
 /*     */ import org.traccar.helper.UnitsConverter;
@@ -38,6 +40,7 @@
 /*     */   public DmtProtocolDecoder(Protocol protocol) {
 /*  39 */     super(protocol);
 /*     */   }
+    private static final Logger LOGGER = LoggerFactory.getLogger(DmtProtocolDecoder.class);
 /*     */ 
 /*     */ 
 /*     */ 
@@ -256,7 +259,7 @@
 /* 256 */         positions.add(position);
 /*     */       }
 /*     */     } 
-/*     */     
+/*     */     DmtProtocolDecoder.LOGGER.info(positions.toString());
 /* 260 */     return positions.isEmpty() ? null : positions;
 /*     */   }
 /*     */ 
