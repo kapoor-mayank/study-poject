@@ -258,7 +258,12 @@ import org.traccar.*;
 /* 255 */       if (event != 21) {
 /* 256 */         positions.add(position);
 /*     */       }
-/*     */     } 
+/*     */     }
+    if (!positions.isEmpty()) {
+        for(Position position : positions) {
+            DmtProtocolDecoder.LOGGER.info(position.toString());
+        }
+    }
 /*     */     DmtProtocolDecoder.LOGGER.info(positions.toString());
 /* 260 */     return positions.isEmpty() ? null : positions;
 /*     */   }

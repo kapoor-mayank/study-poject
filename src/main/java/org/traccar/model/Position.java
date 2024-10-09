@@ -169,7 +169,29 @@
 /*     */   public String getUniqueId() {
 /* 170 */     return ((Device)Context.getDeviceManager().getById(getDeviceId())).getUniqueId();
 /*     */   }
-/*     */ 
+
+    @Override
+    public String toString() {
+        return "Position{" +
+                "protocol='" + protocol + '\'' +
+                ", serverTime=" + serverTime +
+                ", deviceTime=" + deviceTime +
+                ", fixTime=" + fixTime +
+                ", outdated=" + outdated +
+                ", valid=" + valid +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", altitude=" + altitude +
+                ", speed=" + speed +
+                ", course=" + course +
+                ", address='" + address + '\'' +
+                ", accuracy=" + accuracy +
+                ", network=" + network +
+                ", packetType='" + packetType + '\'' +
+                '}';
+    }
+
+    /*     */
 /*     */ 
 /*     */   
 /*     */   public String getProtocol() {
