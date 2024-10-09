@@ -142,6 +142,7 @@ public class WebServer {
 
     public void start() {
         try {
+            LOGGER.info("WebServer start()");
             this.server.start();
         } catch (Exception error) {
             LOGGER.warn("Web server start failed", error);

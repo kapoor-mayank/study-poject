@@ -27,6 +27,7 @@ public abstract class BasePipelineFactory extends ChannelInitializer<Channel> {
     private int timeout;
 
     public BasePipelineFactory(TrackerConnector connector, String protocol) {
+        LOGGER.info("BasePipeLineFactory initialised for: " + protocol);
         this.connector = connector;
         this.protocol = protocol;
         this.eventsEnabled = Context.getConfig().getBoolean(Keys.EVENT_ENABLE);
@@ -61,6 +62,7 @@ public abstract class BasePipelineFactory extends ChannelInitializer<Channel> {
 
     @Override
     protected void initChannel(Channel channel) {
+        LOGGER.info("BasePipeLineFactory initChannel for: "+ channel);
         ChannelPipeline pipeline = channel.pipeline();
 
         addTransportHandlers(pipeline::addLast);

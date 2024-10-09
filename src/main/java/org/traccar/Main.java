@@ -88,8 +88,10 @@ public final class Main {
         }).start();
     }
     private static void initServer() throws Exception {
+        LOGGER.info("Main initServer()");
         Context.getServerManager().start();
         if (Context.getWebServer() != null) {
+            LOGGER.info("Main initServer() start WebServer");
             Context.getWebServer().start();
         }
         (new Timer()).scheduleAtFixedRate(new TimerTask() {
