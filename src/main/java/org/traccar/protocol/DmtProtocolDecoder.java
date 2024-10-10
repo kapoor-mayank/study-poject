@@ -36,6 +36,7 @@ public class DmtProtocolDecoder
 
     public DmtProtocolDecoder(Protocol protocol) {
         super(protocol);
+        LOGGER.info("DMTProtocolDecoder intialized");
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DmtProtocolDecoder.class);
@@ -255,7 +256,7 @@ public class DmtProtocolDecoder
 
     protected Object decode(Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
         ByteBuf buf = (ByteBuf) msg;
-
+        LOGGER.info("Inside dmtDECODE():", msg);
         buf.skipBytes(2);
 
         int type = buf.readUnsignedByte();
