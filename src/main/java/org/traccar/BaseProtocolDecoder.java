@@ -128,6 +128,7 @@ public abstract class BaseProtocolDecoder extends ExtendedObjectDecoder {
     }
 
     public DeviceSession getDeviceSession(Channel channel, SocketAddress remoteAddress, String... uniqueIds) {
+        LOGGER.info("getDeviceSession: {}", channel.getClass().getSimpleName());
         return getDeviceSession(channel, remoteAddress, false, uniqueIds);
     }
 

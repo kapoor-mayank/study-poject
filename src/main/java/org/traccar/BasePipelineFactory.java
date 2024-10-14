@@ -86,12 +86,13 @@ public abstract class BasePipelineFactory extends ChannelInitializer<Channel> {
 
     protected void initChannel(Channel channel) {
         ChannelPipeline pipeline = channel.pipeline();
-        LOGGER.info("BasePipeLineFactory initChannel: ", channel);
+        LOGGER.info("BasePipeLineFactory initChannel: {}", channel.getClass().getSimpleName());
         // Simplified transport handlers addition with lambda expressions
-        addTransportHandlers(handler -> pipeline.addLast(handler));
+        addTransportHandlers(handler -> {
+            LOGGER.info("Handler  :  {}", handler.getClass().getSimpleName());
+            pipeline.addLast(handler);});
 
         pipeline.addLast(new ForwarderHandler());
-
         // Adding idle state handler if timeout is set and not using datagram
         if (this.timeout > 0 && !this.connector.isDatagram()) {
             pipeline.addLast(new IdleStateHandler(this.timeout, 0, 0));
@@ -106,16 +107,27 @@ public abstract class BasePipelineFactory extends ChannelInitializer<Channel> {
             if (!(handler instanceof BaseProtocolDecoder) && !(handler instanceof BaseProtocolEncoder)) {
                 if (handler instanceof ChannelInboundHandler) {
                     pipeline.addLast(new WrapperInboundHandler((ChannelInboundHandler) handler));
-                    LOGGER.info("instanceof ChannelInboundHandler: ", new WrapperInboundHandler((ChannelInboundHandler) handler).toString() );
+                    LOGGER.info("instanceof ChannelInboundHandler: {}", handler.getClass().getSimpleName() );
                 } else if (handler instanceof ChannelOutboundHandler) {
                     pipeline.addLast(new WrapperOutboundHandler((ChannelOutboundHandler) handler));
-                    LOGGER.info("instanceof ChannelOutboundHandler: ", new WrapperOutboundHandler((ChannelOutboundHandler) handler).toString() );
+                    LOGGER.info("instanceof ChannelOutboundHandler: {}", handler.getClass().getSimpleName() );
                 } else {
                     pipeline.addLast(handler);
                 }
             }
         });
-
+//        addProtocolHandlers(handler -> {
+//            WrapperOutboundHandler wrapperOutboundHandler;
+//            if (!(handler instanceof BaseProtocolDecoder) && !(handler instanceof BaseProtocolEncoder)) {
+//            WrapperInboundHandler wrapperInboundHandler;
+//                if (handler instanceof ChannelInboundHandler) {
+//                    wrapperInboundHandler = new WrapperInboundHandler((ChannelInboundHandler)handler);
+//                } else {
+//                    wrapperOutboundHandler = new WrapperOutboundHandler((ChannelOutboundHandler)wrapperInboundHandler);
+//                }
+//            }
+//            pipeline.addLast(new ChannelHandler[] { (ChannelHandler)wrapperOutboundHandler });
+//        });
         // Adding various predefined handlers
         addHandlers(pipeline, TimeHandler.class, GeolocationHandler.class, HemisphereHandler.class,
                 DistanceHandler.class, RemoteAddressHandler.class);
