@@ -10,7 +10,7 @@
 /*    */ import java.util.Date;
 /*    */ import java.util.Iterator;
 /*    */ import org.apache.poi.ss.util.WorkbookUtil;
-/*    */ import org.jxls.common.Context;
+/*    */ //import org.jxls.common.Context;
 /*    */ import org.traccar.Context;
 /*    */ import org.traccar.Main;
 /*    */ import org.traccar.database.DeviceManager;
@@ -90,7 +90,7 @@
 /* 90 */     String templatePath = Context.getConfig().getString("report.templatesPath", "templates/export/");
 /*    */     
 /* 92 */     try (InputStream inputStream = new FileInputStream(templatePath + "/stops.xlsx")) {
-/* 93 */       Context jxlsContext = ReportUtils.initializeContext(userId);
+/* 93 */       org.jxls.common.Context jxlsContext = ReportUtils.initializeContext(userId);
 /* 94 */       jxlsContext.putVar("devices", devicesStops);
 /* 95 */       jxlsContext.putVar("sheetNames", sheetNames);
 /* 96 */       jxlsContext.putVar("from", from);

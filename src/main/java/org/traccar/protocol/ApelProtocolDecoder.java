@@ -3,11 +3,16 @@
 /*     */ import io.netty.buffer.Unpooled;
 /*     */ import io.netty.channel.Channel;
 /*     */ import java.net.SocketAddress;
-/*     */ import java.util.Date;
-/*     */ import org.traccar.DeviceSession;
+/*     */ import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+/*     */ import org.traccar.BaseProtocolDecoder;
+import org.traccar.DeviceSession;
 /*     */ import org.traccar.NetworkMessage;
 /*     */ import org.traccar.Protocol;
-/*     */ import org.traccar.model.Position;
+/*     */ import org.traccar.helper.Checksum;
+import org.traccar.model.Position;
 /*     */ 
 /*     */ public class ApelProtocolDecoder extends BaseProtocolDecoder {
 /*     */   private long lastIndex;

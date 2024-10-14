@@ -9,7 +9,7 @@
 /*     */ import java.util.Collection;
 /*     */ import java.util.Date;
 /*     */ import java.util.Iterator;
-/*     */ import org.jxls.common.Context;
+/*     */ //import org.jxls.common.Context;
 /*     */ import org.jxls.util.JxlsHelper;
 /*     */ import org.traccar.Context;
 /*     */ import org.traccar.model.Position;
@@ -106,7 +106,7 @@
 /* 106 */     String templatePath = Context.getConfig().getString("report.templatesPath", "templates/export/");
 /*     */     
 /* 108 */     try (InputStream inputStream = new FileInputStream(templatePath + "/summary.xlsx")) {
-/* 109 */       Context jxlsContext = ReportUtils.initializeContext(userId);
+/* 109 */       org.jxls.common.Context jxlsContext = ReportUtils.initializeContext(userId);
 /* 110 */       jxlsContext.putVar("summaries", summaries);
 /* 111 */       jxlsContext.putVar("from", from);
 /* 112 */       jxlsContext.putVar("to", to);

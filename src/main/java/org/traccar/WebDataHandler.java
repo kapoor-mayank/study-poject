@@ -82,8 +82,8 @@
 /*  82 */       double lat = position.getLatitude();
 /*  83 */       double lon = position.getLongitude();
 /*     */       
-/*  85 */       f.format("%02d%07.4f,%c,", new Object[] { Integer.valueOf((int)Math.abs(lat)), Double.valueOf(Math.abs(lat) % 1.0D * 60.0D), Character.valueOf((lat < 0.0D) ? 83 : 78) });
-/*  86 */       f.format("%03d%07.4f,%c,", new Object[] { Integer.valueOf((int)Math.abs(lon)), Double.valueOf(Math.abs(lon) % 1.0D * 60.0D), Character.valueOf((lon < 0.0D) ? 87 : 69) });
+/*  85 */       f.format("%02d%07.4f,%c,", new Object[] { Integer.valueOf((int)Math.abs(lat)), Double.valueOf(Math.abs(lat) % 1.0D * 60.0D), Character.valueOf((char) ((lat < 0.0D) ? 83 : 78)) });
+/*  86 */       f.format("%03d%07.4f,%c,", new Object[] { Integer.valueOf((int)Math.abs(lon)), Double.valueOf(Math.abs(lon) % 1.0D * 60.0D), Character.valueOf((char) ((lon < 0.0D) ? 87 : 69)) });
 /*     */       
 /*  88 */       f.format("%.2f,%.2f,", new Object[] { Double.valueOf(position.getSpeed()), Double.valueOf(position.getCourse()) });
 /*  89 */       f.format("%1$td%1$tm%1$ty,,", new Object[] { calendar });

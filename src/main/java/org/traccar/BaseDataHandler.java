@@ -2,7 +2,9 @@
 /*    */ 
 /*    */ import io.netty.channel.ChannelHandlerContext;
 /*    */ import io.netty.channel.ChannelInboundHandlerAdapter;
-/*    */ import org.traccar.model.Position;
+/*    */ import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.traccar.model.Position;
 /*    */ 
 /*    */ 
 /*    */ 
@@ -22,6 +24,7 @@
 /*    */ public abstract class BaseDataHandler
 /*    */   extends ChannelInboundHandlerAdapter
 /*    */ {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseDataHandler.class);
 /*    */   public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 /* 26 */     if (msg instanceof Position) {
 /* 27 */       Position position = handlePosition((Position)msg);
@@ -29,6 +32,7 @@
 /* 29 */         ctx.fireChannelRead(position);
 /*    */       }
 /*    */     } else {
+    LOGGER.info("BaseDataHandler channelRead(): "+ msg);
 /* 32 */       super.channelRead(ctx, msg);
 /*    */     } 
 /*    */   }

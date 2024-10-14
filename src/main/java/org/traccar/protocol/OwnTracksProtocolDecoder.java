@@ -149,7 +149,7 @@
 /*     */     
 /* 150 */     if (root.containsKey("anum")) {
 /* 151 */       Integer numberOfAnalogueInputs = Integer.valueOf(root.getInt("anum"));
-/* 152 */       for (Integer i = Integer.valueOf(0); i.intValue() < numberOfAnalogueInputs.intValue(); integer1 = i, integer2 = i = Integer.valueOf(i.intValue() + 1)) {
+/* 152 */       for (Integer i = Integer.valueOf(0); i.intValue() < numberOfAnalogueInputs.intValue(); i = Integer.valueOf(i.intValue() + 1)) {
 /* 153 */         Integer integer1, integer2; String indexString = String.format("%02d", new Object[] { i });
 /* 154 */         if (root.containsKey("adda-" + indexString)) {
 /* 155 */           position.set("adc" + (i.intValue() + 1), root.getString("adda-" + indexString));

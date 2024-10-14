@@ -40,7 +40,9 @@
 /*  40 */       String defaultConfigFile = mainProperties.getProperty("config.default");
 /*  41 */       if (defaultConfigFile != null) {
 /*  42 */         try (InputStream inputStream = new FileInputStream(defaultConfigFile)) {
-/*  43 */           this.properties.loadFromXML(inputStream1);
+/*  43 */
+
+                this.properties.loadFromXML(inputStream);
 /*     */         } 
 /*     */       }
 /*     */       
