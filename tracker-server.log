@@ -125,3 +125,5 @@
 2024-10-11 17:53:33  INFO: BaseDataHandler channelRead(): NetworkMessage{remoteAddress=/127.0.0.1:52257, message=PooledSlicedByteBuf(ridx: 0, widx: 54, cap: 54/54, unwrapped: PooledUnsafeDirectByteBuf(ridx: 54, widx: 54, cap: 2048))}
 2024-10-11 17:53:33  INFO: BaseDataHandler channelRead(): NetworkMessage{remoteAddress=/127.0.0.1:52257, message=PooledSlicedByteBuf(ridx: 0, widx: 54, cap: 54/54, unwrapped: PooledUnsafeDirectByteBuf(ridx: 54, widx: 54, cap: 2048))}
 2024-10-11 17:53:33  INFO: BaseDataHandler channelRead(): NetworkMessage{remoteAddress=/127.0.0.1:52257, message=PooledSlicedByteBuf(ridx: 0, widx: 54, cap: 54/54, unwrapped: PooledUnsafeDirectByteBuf(ridx: 54, widx: 54, cap: 2048))}
+2024-10-11 17:57:03  INFO: [e75fc58e: 6137] 127.0.0.1:52257 -  disconnected
+2024-10-11 17:57:03  WARN: [e75fc58e: 6137] 127.0.0.1:52257 - error - NullPointerException (MainEventHandler:141 < ... < WrapperInboundHandler:39 < ... < OpenChannelHandler:38 < ...)
