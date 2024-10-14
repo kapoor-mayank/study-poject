@@ -13,16 +13,27 @@ import io.netty.channel.ChannelPromise;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.EventExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.SocketAddress;
 
 public class WrapperContext implements ChannelHandlerContext {
     private ChannelHandlerContext context;
 
     private SocketAddress remoteAddress;
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(WrapperContext.class);
     public WrapperContext(ChannelHandlerContext context, SocketAddress remoteAddress) {
         this.context = context;
         this.remoteAddress = remoteAddress;
+    }
+
+    @Override
+    public String toString() {
+        return "WrapperContext{" +
+                "context=" + context +
+                ", remoteAddress=" + remoteAddress +
+                '}';
     }
 
     public Channel channel() {
