@@ -25,7 +25,15 @@
 /*     */   public Map<String, Object> getAttributes() {
 /*  26 */     return this.attributes;
 /*     */   }
-/*     */   
+
+    @Override
+    public String toString() {
+        return "ExtendedModel{" +
+                "attributes=" + attributes +
+                '}';
+    }
+
+    /*     */
 /*     */   public void setAttributes(Map<String, Object> attributes) {
 /*  30 */     this.attributes = attributes;
 /*     */   }

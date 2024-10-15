@@ -161,6 +161,7 @@ public class Position
                 ", accuracy=" + accuracy +
                 ", network=" + network +
                 ", packetType='" + packetType + '\'' +
+                ", attributes" + this.getAttributes() + '\'' +
                 '}';
     }
 
