@@ -121,6 +121,7 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
             if (event == 11)
                 position.setDeviceTime(new Date());
             position.set("event", Integer.valueOf(event));
+            LOGGER.info("DmtProtocolDecoder - The value of event is: {}, multipying it by 2: {}", Integer.valueOf(event), 2 * Integer.valueOf(event));
             while (buf.readerIndex() < recordEnd) {
                 int fieldId = buf.readUnsignedByte();
                 int fieldLength = buf.readUnsignedByte();
@@ -186,6 +187,12 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
                 getLastLocation(position, position.getDeviceTime());
             if (event != 21)
                 positions.add(position);
+        }
+        if (!positions.isEmpty()) {
+            for(Position position: positions) {
+                int count = 0;
+                LOGGER.info("Inside DmtProtocolDecoder, Position{} Object decoded: {}", count++, position);
+            }
         }
         return positions.isEmpty() ? null : positions;
     }
