@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import java.net.SocketAddress;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.LinkedList;
@@ -108,15 +109,25 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
 
     private List<Position> decodeStandard(Channel channel, SocketAddress remoteAddress, ByteBuf buf) {
         DeviceSession deviceSession = getDeviceSession(channel, remoteAddress, new String[0]);
-        if (deviceSession == null)
-            return null;
+        LOGGER.info("Inside decodeStandard method :: DeviceSession :: {}", deviceSession);
+        if (deviceSession == null) return null;
+
         List<Position> positions = new LinkedList<>();
+        LOGGER.info("Positions :: {}", positions);
+
         while (buf.isReadable()) {
             int recordEnd = buf.readerIndex() + buf.readUnsignedShortLE();
+            LOGGER.info("RecordEnd :: {}", recordEnd);
+
             Position position = new Position(getProtocolName());
+            LOGGER.info("Position Before Population :: {}", position);
+
             position.setDeviceId(deviceSession.getDeviceId());
             position.set("index", Long.valueOf(buf.readUnsignedIntLE()));
             position.setDeviceTime(new Date(1356998400000L + buf.readUnsignedIntLE() * 1000L));
+
+            LOGGER.info("Position After Population :: {}", position);
+
             int event = buf.readUnsignedByte();
             if (event == 11)
                 position.setDeviceTime(new Date());
@@ -198,16 +209,28 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
     }
 
     protected Object decode(Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
-        LOGGER.info("Inside decode DmtProtocolDecoder: {}", channel.getClass().getSimpleName());
+        LOGGER.info("Inside decode DmtProtocolDecoder Channel :: {} :: SocketAddress :: {} :: Message :: {}", channel.getClass().getSimpleName(), remoteAddress, (String) msg);
+
         ByteBuf buf = (ByteBuf)msg;
+        assert buf == null : "Byte Buffer ids null";
+
+        LOGGER.info("Byte Buf In String :: {}", buf.toString(StandardCharsets.UTF_8));
+
         buf.skipBytes(2);
         int type = buf.readUnsignedByte();
+        LOGGER.info("Type :: {}", type);
+
         int length = buf.readUnsignedShortLE();
+        LOGGER.info("Length :: {}", length);
+
         if (type == 0) {
             buf.readUnsignedIntLE();
-            DeviceSession deviceSession = getDeviceSession(channel, remoteAddress, new String[] { buf
-                    .readSlice(15).toString(StandardCharsets.US_ASCII) });
+            DeviceSession deviceSession = getDeviceSession(channel, remoteAddress, new String[] { buf.readSlice(15).toString(StandardCharsets.US_ASCII) });
+            LOGGER.info("DeviceSession :: {}", deviceSession);
+
             ByteBuf response = Unpooled.buffer();
+            LOGGER.info("Response Before Checks :: {}", response.toString(StandardCharsets.UTF_8));
+
             if (length == 51) {
                 response.writeByte(0);
                 response.writeIntLE(0);
@@ -215,6 +238,8 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
                 response.writeIntLE((int)((System.currentTimeMillis() - 1356998400000L) / 1000L));
                 response.writeIntLE((deviceSession != null) ? 0 : 1);
             }
+            LOGGER.info("Response After Checks :: {}", response.toString(StandardCharsets.UTF_8));
+
             sendResponse(channel, 1, response);
         } else if (type == 5) {
             ByteBuf response = Unpooled.buffer(0);
