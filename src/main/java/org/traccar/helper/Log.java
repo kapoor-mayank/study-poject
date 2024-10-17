@@ -11,6 +11,8 @@ import java.io.Writer;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Formatter;
@@ -28,56 +30,72 @@ public final class Log {
 
     private static class RollingFileHandler extends Handler {
         private String name;
-
         private String suffix;
-
         private Writer writer;
-
         private boolean rotate;
 
         RollingFileHandler(String name, boolean rotate) {
             this.name = name;
             this.rotate = rotate;
+            // Initialize the suffix with the current date to compare and generate new file based on Date change
+            this.suffix = (new SimpleDateFormat("yyyyMMdd")).format(new Date());
         }
 
         public synchronized void publish(LogRecord record) {
-            if (isLoggable(record))
+            if (isLoggable(record)) {
                 try {
-                    String suffix = "";
-                    if (this.rotate) {
-                        suffix = (new SimpleDateFormat("yyyyMMdd")).format(new Date(record.getMillis()));
-                        this.writer.close();
-                        this.writer = null;
-                        if (this.writer != null && !suffix.equals(this.suffix) && !(new File(this.name)).renameTo(new File(this.name + "." + this.suffix)))
-                            throw new RuntimeException("Log file renaming failed");
+                    String currentSuffix = (new SimpleDateFormat("yyyyMMdd")).format(new Date(record.getMillis()));
+
+                    // Check if the suffix (date) has changed for log rotation
+                    if (this.rotate && !currentSuffix.equals(this.suffix)) {
+                        if (this.writer != null) {
+                            this.writer.close(); // Close the current writer
+                            File oldFile = new File(this.name);
+                            File newFile = new File(this.name + "." + this.suffix);
+
+                            // Rename the current log file with the old suffix
+                            if (!oldFile.renameTo(newFile)) {
+                                throw new RuntimeException("Log file renaming failed");
+                            }
+                            this.writer = null; // Reset the writer to null for reinitialization
+                        }
+                        this.suffix = currentSuffix; // Update suffix with new date
                     }
+
+                    // Initialize the writer if it's null (after rotation or first run)
                     if (this.writer == null) {
-                        this.suffix = suffix;
-                        this.writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.name, true), StandardCharsets.UTF_8));
+                        this.writer = new BufferedWriter(new OutputStreamWriter(
+                                new FileOutputStream(this.name, true), StandardCharsets.UTF_8));
                     }
+
+                    // Write the formatted log record to the writer
                     this.writer.write(getFormatter().format(record));
-                    this.writer.flush();
+                    this.writer.flush();  // Ensure logs are flushed to the file
+
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+            }
         }
 
         public synchronized void flush() {
-            if (this.writer != null)
+            if (this.writer != null) {
                 try {
                     this.writer.flush();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+            }
         }
 
         public synchronized void close() throws SecurityException {
-            if (this.writer != null)
+            if (this.writer != null) {
                 try {
                     this.writer.close();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+            }
         }
     }
 
@@ -120,8 +138,7 @@ public final class Log {
                     message.append(Log.exceptionStack(record.getThrown()));
                 }
             }
-            return String.format("%1$tF %1$tT %2$5s: %3$s%n", new Object[]{new Date(record
-                    .getMillis()), formatLevel(record.getLevel()), message.toString()});
+            return String.format("%1$tF %1$tT %2$5s: %3$s%n", new Object[]{new Date(record.getMillis()), formatLevel(record.getLevel()), message.toString()});
         }
     }
 
@@ -139,12 +156,9 @@ public final class Log {
     }
 
     public static void setupLogger(Config config) {
-        setupLogger(config
-                .getBoolean("logger.console"), config
-                .getString("logger.file"), config
-                .getString("logger.level"), config
-                .getBoolean("logger.fullStackTraces"), config
-                .getBoolean("logger.rotate"));
+        setupLogger(config.getBoolean("logger.console"), config.getString("logger.file"),
+                config.getString("logger.level"), config.getBoolean("logger.fullStackTraces"),
+                config.getBoolean("logger.rotate"));
     }
 
     private static void setupLogger(boolean console, String file, String levelString, boolean fullStackTraces, boolean rotate) {
@@ -169,13 +183,12 @@ public final class Log {
         StringBuilder s = new StringBuilder();
         String exceptionMsg = exception.getMessage();
         if (exceptionMsg != null) {
-            s.append(exceptionMsg);
-            s.append(" - ");
+            s.append(exceptionMsg).append(" - ");
         }
         s.append(exception.getClass().getSimpleName());
         StackTraceElement[] stack = exception.getStackTrace();
         if (stack.length > 0) {
-            int count = 3;
+            int count = STACK_LIMIT;
             boolean first = true;
             boolean skip = false;
             String file = "";
