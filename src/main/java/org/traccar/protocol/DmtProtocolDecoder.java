@@ -1,14 +1,22 @@
 package org.traccar.protocol;
 
+import com.google.common.io.ByteSource;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+
+import java.io.InputStream;
+import java.math.BigInteger;
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,12 +80,12 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
             position.set("index", Long.valueOf(buf.readUnsignedIntLE()));
             long time = buf.readUnsignedIntLE();
             position.setTime((new DateBuilder())
-                    .setYear((int)(2000L + (time & 0x3FL)))
-                    .setMonth((int)(time >> 6L) & 0xF)
-                    .setDay((int)(time >> 10L) & 0x1F)
-                    .setHour((int)(time >> 15L) & 0x1F)
-                    .setMinute((int)(time >> 20L) & 0x3F)
-                    .setSecond((int)(time >> 26L) & 0x3F)
+                    .setYear((int) (2000L + (time & 0x3FL)))
+                    .setMonth((int) (time >> 6L) & 0xF)
+                    .setDay((int) (time >> 10L) & 0x1F)
+                    .setHour((int) (time >> 15L) & 0x1F)
+                    .setMinute((int) (time >> 20L) & 0x3F)
+                    .setSecond((int) (time >> 26L) & 0x3F)
                     .getDate());
             position.setLongitude(buf.readIntLE() * 1.0E-7D);
             position.setLatitude(buf.readIntLE() * 1.0E-7D);
@@ -200,7 +208,7 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
                 positions.add(position);
         }
         if (!positions.isEmpty()) {
-            for(Position position: positions) {
+            for (Position position : positions) {
                 int count = 0;
                 LOGGER.info("Inside DmtProtocolDecoder, Position{} Object decoded: {}", count++, position);
             }
@@ -211,10 +219,17 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
     protected Object decode(Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
         LOGGER.info("Inside decode DmtProtocolDecoder Channel :: {} :: SocketAddress :: {} :: Message :: {}", channel.getClass().getSimpleName(), remoteAddress, msg);
 
-        ByteBuf buf = (ByteBuf)msg;
+        ByteBuf buf = (ByteBuf) msg;
         assert buf == null : "Byte Buffer ids null";
 
-        LOGGER.info("Byte Buf In String :: {}", buf.toString(StandardCharsets.UTF_8));
+        ByteBuffer byteBuffer = ByteBuffer.wrap(buf.array());
+        AtomicInteger atomicInteger = new AtomicInteger(BigInteger.ONE.intValue());
+
+        Stream.generate(byteBuffer::get)
+                .limit(byteBuffer.capacity())
+                .forEachOrdered(byteData -> {
+                    LOGGER.info("Byte {} :: {}", atomicInteger.getAndIncrement(), String.format("%8s", Integer.toBinaryString(byteData & 0xFF)).replace(' ', '0'));
+                });
 
         buf.skipBytes(2);
         int type = buf.readUnsignedByte();
@@ -225,7 +240,7 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
 
         if (type == 0) {
             buf.readUnsignedIntLE();
-            DeviceSession deviceSession = getDeviceSession(channel, remoteAddress, new String[] { buf.readSlice(15).toString(StandardCharsets.US_ASCII) });
+            DeviceSession deviceSession = getDeviceSession(channel, remoteAddress, new String[]{buf.readSlice(15).toString(StandardCharsets.US_ASCII)});
             LOGGER.info("DeviceSession :: {}", deviceSession);
 
             ByteBuf response = Unpooled.buffer();
@@ -235,7 +250,7 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
                 response.writeByte(0);
                 response.writeIntLE(0);
             } else {
-                response.writeIntLE((int)((System.currentTimeMillis() - 1356998400000L) / 1000L));
+                response.writeIntLE((int) ((System.currentTimeMillis() - 1356998400000L) / 1000L));
                 response.writeIntLE((deviceSession != null) ? 0 : 1);
             }
             LOGGER.info("Response After Checks :: {}", response.toString(StandardCharsets.UTF_8));
@@ -250,7 +265,7 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
             response.writeBytes(new byte[12]);
             sendResponse(channel, 21, response);
         } else if (type == 34) {
-            sendResponse(channel, 35, (ByteBuf)null);
+            sendResponse(channel, 35, (ByteBuf) null);
         } else {
             if (type == 16)
                 return decodeFixed64(channel, remoteAddress, buf);
