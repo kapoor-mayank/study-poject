@@ -209,7 +209,7 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
     }
 
     protected Object decode(Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
-        LOGGER.info("Inside decode DmtProtocolDecoder Channel :: {} :: SocketAddress :: {} :: Message :: {}", channel.getClass().getSimpleName(), remoteAddress, (String) msg);
+        LOGGER.info("Inside decode DmtProtocolDecoder Channel :: {} :: SocketAddress :: {} :: Message :: {}", channel.getClass().getSimpleName(), remoteAddress, msg);
 
         ByteBuf buf = (ByteBuf)msg;
         assert buf == null : "Byte Buffer ids null";
