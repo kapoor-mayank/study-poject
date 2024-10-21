@@ -141,7 +141,7 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
             if (event == 11)
                 position.setDeviceTime(new Date());
             position.set("event", Integer.valueOf(event));
-            LOGGER.info("DmtProtocolDecoder - The value of event is: {}, multipying it by 2: {}", Integer.valueOf(event), 2 * Integer.valueOf(event));
+//            LOGGER.info("DmtProtocolDecoder - The value of event is: {}, multipying it by 2: {}", Integer.valueOf(event), 2 * Integer.valueOf(event));
             while (buf.readerIndex() < recordEnd) {
                 int fieldId = buf.readUnsignedByte();
                 int fieldLength = buf.readUnsignedByte();
@@ -281,7 +281,7 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
     }
 
     private List<WiFiData> parseWiFiDataScan(ByteBuf buf, int length) {
-        List<WiFiData> WiFiDatas = new LinkedList<>();
+        List<WiFiData> wiFiDatas = new LinkedList<>();
 
         int dataFieldLength = 8; // Fixed length for each Wi-Fi data entry
         int maxEntries = 30; // Maximum number of entries
@@ -303,11 +303,12 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
             int channelNum = buf.readUnsignedByte() & 0x0F;
 
             // Create Wi-Fi location object and add to the list
-            WiFiData WiFiData = new WiFiData(macAddress.toString(), signalStrength, channelNum);
-            WiFiDatas.add(WiFiData);
+            WiFiData wiFiData = new WiFiData(macAddress.toString(), signalStrength, channelNum);
+            LOGGER.info("WiFi data parsed as :: {}", wiFiData);
+            wiFiDatas.add(wiFiData);
         }
 
-        return WiFiDatas;
+        return wiFiDatas;
     }
 
 }
