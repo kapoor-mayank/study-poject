@@ -1,0 +1,36 @@
+package org.traccar.model;
+
+public class WiFiData {
+    private String macAddress;
+    private int signalStrength;
+    private int channelNum;
+
+    public WiFiData(String macAddress, int signalStrength, int channelNum) {
+        this.macAddress = macAddress;
+        this.signalStrength = signalStrength;
+        this.channelNum = channelNum;
+    }
+
+    // Getters and toString method for logging/debugging
+    public String getMacAddress() {
+        return macAddress;
+    }
+
+    public int getSignalStrength() {
+        return signalStrength;
+    }
+
+    public int getChannelNum() {
+        return channelNum;
+    }
+
+    @Override
+    public String toString() {
+        return "WiFiLocation{" +
+                "macAddress='" + macAddress + '\'' +
+                ", signalStrength=" + signalStrength +
+                ", channelNum=" + channelNum +
+                '}';
+    }
+}
+

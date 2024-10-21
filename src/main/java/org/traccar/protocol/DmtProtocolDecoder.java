@@ -25,6 +25,7 @@ import org.traccar.helper.BitUtil;
 import org.traccar.helper.DateBuilder;
 import org.traccar.helper.UnitsConverter;
 import org.traccar.model.Position;
+import org.traccar.model.WiFiData;
 
 public class DmtProtocolDecoder extends BaseProtocolDecoder {
     private static final Logger LOGGER = LoggerFactory.getLogger(DmtProtocolDecoder.class);
@@ -193,6 +194,10 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
                         }
                         position.set("io" + number, Integer.valueOf(buf.readUnsignedShortLE()));
                     }
+                } else if (fieldId == 25) {
+                    //In JavaScript Decoder WiFi Data is parsed when fieldID == 25
+                    List<WiFiData> wifiDatas = parseWiFiDataScan(buf, fieldLength);
+                    position.set("wifiData", wifiDatas.toString());
                 } else if (fieldId == 26) {
                     position.set("tripOdometer", Long.valueOf(buf.readUnsignedIntLE()));
                     position.set("tripHours", Long.valueOf(buf.readUnsignedIntLE() * 1000L));
@@ -220,16 +225,16 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
         LOGGER.info("Inside decode DmtProtocolDecoder Channel :: {} :: SocketAddress :: {} :: Message :: {}", channel.getClass().getSimpleName(), remoteAddress, msg);
 
         ByteBuf buf = (ByteBuf) msg;
-        assert buf == null : "Byte Buffer ids null";
-
-        ByteBuffer byteBuffer = ByteBuffer.wrap(buf.array());
-        AtomicInteger atomicInteger = new AtomicInteger(BigInteger.ONE.intValue());
-
-        Stream.generate(byteBuffer::get)
-                .limit(byteBuffer.capacity())
-                .forEachOrdered(byteData -> {
-                    LOGGER.info("Byte {} :: {}", atomicInteger.getAndIncrement(), String.format("%8s", Integer.toBinaryString(byteData & 0xFF)).replace(' ', '0'));
-                });
+//        assert buf == null : "Byte Buffer ids null";
+//
+//        ByteBuffer byteBuffer = ByteBuffer.wrap(buf.array());
+//        AtomicInteger atomicInteger = new AtomicInteger(BigInteger.ONE.intValue());
+//
+//        Stream.generate(byteBuffer::get)
+//                .limit(byteBuffer.capacity())
+//                .forEachOrdered(byteData -> {
+//                    LOGGER.info("Byte {} :: {}", atomicInteger.getAndIncrement(), String.format("%8s", Integer.toBinaryString(byteData & 0xFF)).replace(' ', '0'));
+//                });
 
         buf.skipBytes(2);
         int type = buf.readUnsignedByte();
@@ -274,4 +279,35 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
         }
         return null;
     }
+
+    private List<WiFiData> parseWiFiDataScan(ByteBuf buf, int length) {
+        List<WiFiData> WiFiDatas = new LinkedList<>();
+
+        int dataFieldLength = 8; // Fixed length for each Wi-Fi data entry
+        int maxEntries = 30; // Maximum number of entries
+
+        for (int i = 0; i < length / dataFieldLength; i++) {
+            if (i >= maxEntries) break;
+
+            // Parse MAC Address (6 bytes)
+            StringBuilder macAddress = new StringBuilder();
+            for (int j = 0; j < 6; j++) {
+                macAddress.append(String.format("%02X", buf.readUnsignedByte()));
+                if (j < 5) macAddress.append(":");
+            }
+
+            // Parse Signal Strength (1 byte)
+            int signalStrength = buf.readUnsignedByte();
+
+            // Parse Channel Number (extract the first 4 bits)
+            int channelNum = buf.readUnsignedByte() & 0x0F;
+
+            // Create Wi-Fi location object and add to the list
+            WiFiData WiFiData = new WiFiData(macAddress.toString(), signalStrength, channelNum);
+            WiFiDatas.add(WiFiData);
+        }
+
+        return WiFiDatas;
+    }
+
 }
