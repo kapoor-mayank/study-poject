@@ -26,7 +26,7 @@ public class RedisManager {
     }
 
     public void writePosition(Position position) throws JsonProcessingException {
-        LOGGER.info("RedisManager writePosition");
+//        LOGGER.info("RedisManager writePosition");
         String key = "positions." + position.getUniqueId();
         String value = this.objectMapper.writeValueAsString(position);
         try (Jedis jedis = new Jedis(Context.getConfig().getString("redis.database"))) {
@@ -35,7 +35,7 @@ public class RedisManager {
     }
 
     public void addDevice(Device device) {
-        LOGGER.info("RedisManager addDevice");
+//        LOGGER.info("RedisManager addDevice");
         try (Jedis jedis = new Jedis(Context.getConfig().getString("redis.database"))) {
             jedis.setnx("connected." + device.getUniqueId(), String.valueOf((new Date()).getTime()));
         }

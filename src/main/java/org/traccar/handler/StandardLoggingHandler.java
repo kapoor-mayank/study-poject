@@ -66,9 +66,3 @@ public class StandardLoggingHandler
         LOGGER.info(message.toString());
     }
 }
-
-
-/* Location:              C:\User\\user\Documents\Ensurity Mobile [Client]\Latest App\traccar\tracker-server.jar!\org\traccar\handler\StandardLoggingHandler.class
- * Java compiler version: 8 (52.0)
- * JD-Core Version:       1.1.3
- */

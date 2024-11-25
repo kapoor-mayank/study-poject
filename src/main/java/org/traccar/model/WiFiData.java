@@ -26,7 +26,7 @@ public class WiFiData {
 
     @Override
     public String toString() {
-        return "WiFiLocation{" +
+        return "{" +
                 "macAddress='" + macAddress + '\'' +
                 ", signalStrength=" + signalStrength +
                 ", channelNum=" + channelNum +

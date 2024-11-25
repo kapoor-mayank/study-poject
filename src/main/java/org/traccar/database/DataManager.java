@@ -193,7 +193,7 @@ public class DataManager {
 
 
     public synchronized void addObject(BaseModel entity) throws SQLException {
-        LOGGER.info("DataManager addObject()");
+//        LOGGER.info("DataManager addObject()");
         if (entity instanceof Device) {
             Device device = (Device) entity;
             device.setId(++this.deviceIncrement);

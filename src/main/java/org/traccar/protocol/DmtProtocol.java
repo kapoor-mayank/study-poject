@@ -18,9 +18,9 @@ public class DmtProtocol extends BaseProtocol {
         addServer(new TrackerServer(false, getName()) {
             protected void addProtocolHandlers(PipelineBuilder pipeline) {
                 pipeline.addLast((ChannelHandler)new LengthFieldBasedFrameDecoder(ByteOrder.LITTLE_ENDIAN, 1024, 3, 2, 0, 0, true));
-                LOGGER.info("Dmt Protocol Added LengthFieldBasedFrameDecoder");
+//                LOGGER.info("Dmt Protocol Added LengthFieldBasedFrameDecoder");
                 pipeline.addLast((ChannelHandler)new DmtProtocolDecoder((Protocol)DmtProtocol.this));
-                LOGGER.info("Dmt Protocol Added decoder: {}", pipeline);
+//                LOGGER.info("Dmt Protocol Added decoder: {}", pipeline);
             }
         });
     }

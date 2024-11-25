@@ -42,10 +42,10 @@ public class WrapperInboundHandler implements ChannelInboundHandler {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof NetworkMessage) {
             NetworkMessage nm = (NetworkMessage)msg;
-            LOGGER.info("WrapperInbound channelRead(): NetworkMessage"+ msg);
+//            LOGGER.info("WrapperInbound channelRead(): NetworkMessage"+ msg);
             this.handler.channelRead(new WrapperContext(ctx, nm.getRemoteAddress()), nm.getMessage());
         } else {
-            LOGGER.info("WrapperInbound channelRead(): else"+ msg);
+//            LOGGER.info("WrapperInbound channelRead(): else"+ msg);
             this.handler.channelRead(ctx, msg);
         }
     }

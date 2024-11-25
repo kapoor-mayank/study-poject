@@ -35,7 +35,7 @@ public abstract class ExtendedObjectDecoder extends ChannelInboundHandlerAdapter
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         NetworkMessage networkMessage = (NetworkMessage) msg;
         Object originalMessage = networkMessage.getMessage();
-        LOGGER.info("Inside channelRead() ExtendedObjectDecoder: ",networkMessage, originalMessage);
+//        LOGGER.info("Inside channelRead() ExtendedObjectDecoder: ",networkMessage, originalMessage);
         try {
             Object decodedMessage = decode(ctx.channel(), networkMessage.getRemoteAddress(), originalMessage);
             onMessageEvent(ctx.channel(), networkMessage.getRemoteAddress(), originalMessage, decodedMessage);

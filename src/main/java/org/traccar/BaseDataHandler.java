@@ -20,7 +20,7 @@ public abstract class BaseDataHandler
                 ctx.fireChannelRead(position);
             }
         } else {
-            LOGGER.info("BaseDataHandler channelRead(): {}", msg);
+//            LOGGER.info("BaseDataHandler channelRead(): {}", msg);
             super.channelRead(ctx, msg);
         }
     }
