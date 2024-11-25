@@ -70,7 +70,7 @@ public class ServerManager {
     }
 
     public void start() throws Exception {
-        LOGGER.info("ServerManager start()");
+//        LOGGER.info("ServerManager start()");
         for (TrackerConnector connector : this.connectorList) {
             try {
                 connector.start();
