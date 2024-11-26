@@ -9,6 +9,7 @@ import java.net.SocketException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.sql.SQLOutput;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Timer;
@@ -18,7 +19,9 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.traccar.config.Config;
 import org.traccar.helper.DataConverter;
+
 
 public final class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
@@ -68,7 +71,6 @@ public final class Main {
         Context.init(args[0]);
         injector = Guice.createInjector(new Module[]{(Module) new MainModule()});
         LOGGER.info("Starting server...");
-
         // Bypassing the license check
         initServerThread(); // Directly call initServerThread to start the server without checking license
     }

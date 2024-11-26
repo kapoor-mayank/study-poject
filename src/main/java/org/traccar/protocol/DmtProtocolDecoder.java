@@ -126,7 +126,7 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
 
             Position position = new Position(getProtocolName());
 //            LOGGER.info("Position Before Population :: {}", position);
-
+//            String uniqueId = Context.getIdentityManager().getById(position.getDeviceId()).getUniqueId();
             position.setDeviceId(deviceSession.getDeviceId());
             position.set("index", Long.valueOf(buf.readUnsignedIntLE()));
             position.setDeviceTime(new Date(1356998400000L + buf.readUnsignedIntLE() * 1000L));
