@@ -301,7 +301,8 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
                 if (j < 5) macAddress.append(":");
             }
             // Parse Signal Strength (1 byte)
-            int signalStrength = buf.readUnsignedByte();
+            int unsignedSignalStrength = buf.readUnsignedByte();
+            int signalStrength = unsignedToSigned(unsignedSignalStrength);
 
             // Parse Channel Number (extract the first 4 bits)
             int channelNum = buf.readUnsignedByte() & 0x0F;
@@ -314,5 +315,11 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
 
         return wiFiDatas;
     }
-
+    /**
+     * Converts an unsigned byte value to its signed equivalent.
+     * Values > 127 are adjusted to the range -128 to -1.
+     */
+    private int unsignedToSigned(int unsignedValue) {
+        return unsignedValue > 127 ? unsignedValue - 256 : unsignedValue;
+    }
 }
