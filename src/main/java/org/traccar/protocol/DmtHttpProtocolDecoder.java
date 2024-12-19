@@ -125,15 +125,35 @@ public class DmtHttpProtocolDecoder
                             position.set("solarPower", Double.valueOf(adc.getInt("5") * 0.001D));
                         }
                         break;
+                    case 36: // Handle Towers information
+                        JsonArray towers = field.getJsonArray("Towers");
+                        for (int k = 0; k < towers.size(); k++) {
+                            JsonObject tower = towers.getJsonObject(k);
+                            position.set("tower" + k + "_srv", tower.getBoolean("SRV", false));
+                            position.set("tower" + k + "_nw", tower.getInt("NW", -1));
+                            position.set("tower" + k + "_cid", tower.getInt("CID", -1));
+                            position.set("tower" + k + "_lac", tower.getInt("LAC", -1));
+                            position.set("tower" + k + "_mcc", tower.getInt("MCC", -1));
+                            position.set("tower" + k + "_mnc", tower.getInt("MNC", -1));
+                            position.set("tower" + k + "_earfcn", tower.getInt("EARFCN", -1));
+                            position.set("tower" + k + "_pcid", tower.getInt("PCID", -1));
+                            position.set("tower" + k + "_rsrp", tower.getInt("RSRP", -1));
+                            position.set("tower" + k + "_rsrq", tower.getInt("RSRQ", -1));
+                            position.set("tower" + k + "_ta", tower.getInt("TA", -1));
+                            if (tower.containsKey("DeltaT")) {
+                                position.set("tower" + k + "_deltat", tower.getInt("DeltaT"));
+                            }
+                        }
+                        break;
                 }
-
-
             }
             positions.add(position);
+            log.info("HTTP DECODER: {}", positions.toString());
         }
 
         return positions;
     }
+
 
 
     private Position decodeEdge(Channel channel, SocketAddress remoteAddress, JsonObject root) {
