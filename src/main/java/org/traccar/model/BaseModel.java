@@ -1,0 +1,36 @@
+/*    */ package org.traccar.model;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class BaseModel
+/*    */ {
+/*    */   private long id;
+/*    */   
+/*    */   public final long getId() {
+/* 24 */     return this.id;
+/*    */   }
+/*    */   
+/*    */   public final void setId(long id) {
+/* 28 */     this.id = id;
+/*    */   }
+/*    */ }
+
+
+/* Location:              C:\User\\user\Documents\Ensurity Mobile [Client]\Latest App\traccar\tracker-server.jar!\org\traccar\model\BaseModel.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */
