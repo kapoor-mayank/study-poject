@@ -360,6 +360,7 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
         buf.skipBytes(1); // Skip reserved bits
 
         detailedTower.put("cellId", buf.readUnsignedIntLE());
+        LOGGER.info("CellID: {}",detailedTower.get("cellId"));
         detailedTower.put("locationAreaCode", buf.readUnsignedShortLE());
         detailedTower.put("mobileCountryCode", buf.readUnsignedShortLE());
         detailedTower.put("mobileNetworkCode", buf.readUnsignedShortLE());
