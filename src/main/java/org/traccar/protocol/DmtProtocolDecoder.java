@@ -196,7 +196,8 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
                     //In JavaScript Decoder WiFi Data is parsed when fieldID == 25
                     List<WiFiData> wifiDatas = parseWiFiDataScan(buf, fieldLength);
                     LOGGER.info("Inside WiFi Case 25");
-                    position.set("wifiData", wifiDatas.toString());
+                    if(!wifiDatas.isEmpty())
+                        position.set("wifiData", wifiDatas.toString());
                 } else if (fieldId == 26) {
                     position.set("tripOdometer", Long.valueOf(buf.readUnsignedIntLE()));
                     position.set("tripHours", Long.valueOf(buf.readUnsignedIntLE() * 1000L));

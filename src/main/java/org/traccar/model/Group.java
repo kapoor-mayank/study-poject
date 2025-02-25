@@ -1,32 +1,18 @@
-/*    */ package org.traccar.model;
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ public class Group
-/*    */   extends GroupedModel
-/*    */ {
-/*    */   private String name;
-/*    */   
-/*    */   public String getName() {
-/* 23 */     return this.name;
-/*    */   }
-/*    */   
-/*    */   public void setName(String name) {
-/* 27 */     this.name = name;
-/*    */   }
-/*    */ }
+package org.traccar.model;
+      
+
+public class Group
+        extends GroupedModel {
+    private String name;
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
 
 
 /* Location:              C:\User\\user\Documents\Ensurity Mobile [Client]\Latest App\traccar\tracker-server.jar!\org\traccar\model\Group.class

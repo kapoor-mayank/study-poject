@@ -1,29 +1,14 @@
-/*    */ package org.traccar.database;
-/*    */ 
-/*    */ import org.traccar.model.Maintenance;
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ public class MaintenancesManager
-/*    */   extends ExtendedObjectManager<Maintenance>
-/*    */ {
-/*    */   public MaintenancesManager(DataManager dataManager) {
-/* 24 */     super(dataManager, Maintenance.class);
-/*    */   }
-/*    */ }
+package org.traccar.database;
+
+import org.traccar.model.Maintenance;
+
+
+public class MaintenancesManager
+        extends ExtendedObjectManager<Maintenance> {
+    public MaintenancesManager(DataManager dataManager) {
+        super(dataManager, Maintenance.class);
+    }
+}
 
 
 /* Location:              C:\User\\user\Documents\Ensurity Mobile [Client]\Latest App\traccar\tracker-server.jar!\org\traccar\database\MaintenancesManager.class

@@ -71,15 +71,13 @@ public class WebServer {
 
         initWebApp(config, servletHandler);
 
-        servletHandler.setErrorHandler(new ErrorHandler()
-                /*     */ {
-            /*     */
-            protected void handleErrorPage(HttpServletRequest request, Writer writer, int code, String message) throws IOException
-            /*     */ {
+        servletHandler.setErrorHandler(new ErrorHandler() {
+
+            protected void handleErrorPage(HttpServletRequest request, Writer writer, int code, String message) throws IOException {
                 writer.write("<!DOCTYPE<html><head><title>Error</title></head><html><body>" + code + " - " +
                         HttpStatus.getMessage(code) + "</body></html>");
             }
-            /*     */
+
         });
 
         HandlerList handlers = new HandlerList();

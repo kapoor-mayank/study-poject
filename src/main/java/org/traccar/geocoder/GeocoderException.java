@@ -1,26 +1,12 @@
-/*    */ package org.traccar.geocoder;
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ public class GeocoderException
-/*    */   extends RuntimeException
-/*    */ {
-/*    */   public GeocoderException(String message) {
-/* 21 */     super(message);
-/*    */   }
-/*    */ }
+package org.traccar.geocoder;
+
+
+public class GeocoderException
+        extends RuntimeException {
+    public GeocoderException(String message) {
+        super(message);
+    }
+}
 
 
 /* Location:              C:\User\\user\Documents\Ensurity Mobile [Client]\Latest App\traccar\tracker-server.jar!\org\traccar\geocoder\GeocoderException.class

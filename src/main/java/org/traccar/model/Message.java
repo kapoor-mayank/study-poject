@@ -1,42 +1,28 @@
-/*    */ package org.traccar.model;
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ public class Message
-/*    */   extends ExtendedModel
-/*    */ {
-/*    */   private long deviceId;
-/*    */   private String type;
-/*    */   
-/*    */   public long getDeviceId() {
-/* 23 */     return this.deviceId;
-/*    */   }
-/*    */   
-/*    */   public void setDeviceId(long deviceId) {
-/* 27 */     this.deviceId = deviceId;
-/*    */   }
-/*    */ 
-/*    */ 
-/*    */   
-/*    */   public String getType() {
-/* 33 */     return this.type;
-/*    */   }
-/*    */   
-/*    */   public void setType(String type) {
-/* 37 */     this.type = type;
-/*    */   }
-/*    */ }
+package org.traccar.model;
+
+
+public class Message
+        extends ExtendedModel {
+    private long deviceId;
+    private String type;
+
+    public long getDeviceId() {
+        return this.deviceId;
+    }
+
+    public void setDeviceId(long deviceId) {
+        this.deviceId = deviceId;
+    }
+
+
+    public String getType() {
+        return this.type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+}
 
 
 /* Location:              C:\User\\user\Documents\Ensurity Mobile [Client]\Latest App\traccar\tracker-server.jar!\org\traccar\model\Message.class

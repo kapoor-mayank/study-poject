@@ -1,30 +1,16 @@
-/*    */ package org.traccar.config;
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ public class ConfigSuffix
-/*    */   extends ConfigKey
-/*    */ {
-/*    */   ConfigSuffix(String key, Class clazz) {
-/* 21 */     super(key, clazz);
-/*    */   }
-/*    */   
-/*    */   public ConfigKey withPrefix(String prefix) {
-/* 25 */     return new ConfigKey(prefix + getKey(), getValueClass());
-/*    */   }
-/*    */ }
+package org.traccar.config;
+
+
+public class ConfigSuffix
+        extends ConfigKey {
+    ConfigSuffix(String key, Class clazz) {
+        super(key, clazz);
+    }
+
+    public ConfigKey withPrefix(String prefix) {
+        return new ConfigKey(prefix + getKey(), getValueClass());
+    }
+}
 
 
 /* Location:              C:\User\\user\Documents\Ensurity Mobile [Client]\Latest App\traccar\tracker-server.jar!\org\traccar\config\ConfigSuffix.class

@@ -1,38 +1,23 @@
-/*    */ package org.traccar.config;
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ public class ConfigKey
-/*    */ {
-/*    */   private final String key;
-/*    */   private final Class clazz;
-/*    */   
-/*    */   ConfigKey(String key, Class clazz) {
-/* 24 */     this.key = key;
-/* 25 */     this.clazz = clazz;
-/*    */   }
-/*    */   
-/*    */   String getKey() {
-/* 29 */     return this.key;
-/*    */   }
-/*    */   
-/*    */   Class getValueClass() {
-/* 33 */     return this.clazz;
-/*    */   }
-/*    */ }
+package org.traccar.config;
+
+
+public class ConfigKey {
+    private final String key;
+    private final Class clazz;
+
+    ConfigKey(String key, Class clazz) {
+        this.key = key;
+        this.clazz = clazz;
+    }
+
+    String getKey() {
+        return this.key;
+    }
+
+    Class getValueClass() {
+        return this.clazz;
+    }
+}
 
 
 /* Location:              C:\User\\user\Documents\Ensurity Mobile [Client]\Latest App\traccar\tracker-server.jar!\org\traccar\config\ConfigKey.class

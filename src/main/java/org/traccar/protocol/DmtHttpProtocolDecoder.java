@@ -125,6 +125,15 @@ public class DmtHttpProtocolDecoder
                             position.set("solarPower", Double.valueOf(adc.getInt("5") * 0.001D));
                         }
                         break;
+                    case 25:    //Handle WiFi realted data
+                        JsonArray aps = field.getJsonArray("APs");
+                        for (int k = 0; k < aps.size(); k++) {
+                            JsonObject ap = aps.getJsonObject(k);
+                            position.set("ap" + k + "_mac", ap.getString("MAC"));
+                            position.set("ap" + k + "_sig", ap.getInt("Sig"));
+                            position.set("ap" + k + "_ch", ap.getInt("Ch"));
+                        }
+                        break;
                     case 36: // Handle Towers information
                         JsonArray towers = field.getJsonArray("Towers");
                         for (int k = 0; k < towers.size(); k++) {

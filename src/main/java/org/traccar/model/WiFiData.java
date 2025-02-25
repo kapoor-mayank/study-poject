@@ -24,22 +24,22 @@ public class WiFiData {
         return channelNum;
     }
 
-    @Override
-    public String toString() {
-        return "{" +
-                "macAddress='" + macAddress + '\'' +
-                ", signalStrength=" + signalStrength +
-                ", channelNum=" + channelNum +
-                '}';
-    }
-    //Added if needed to change WiFi information to proper JSON
 //    @Override
 //    public String toString() {
 //        return "{" +
-//                "\"macAddress\": \"" + macAddress + "\"," +
-//                "\"signalStrength\": " + signalStrength + "," +
-//                "\"channelNum\": " + channelNum +
-//                "}";
+//                "macAddress='" + macAddress + '\'' +
+//                ", signalStrength=" + signalStrength +
+//                ", channelNum=" + channelNum +
+//                '}';
 //    }
+//    Added if needed to change WiFi information to proper JSON
+    @Override
+    public String toString() {
+        return "{" +
+                "\"macAddress\": \"" + macAddress + "\"," +
+                "\"signalStrength\": " + signalStrength + "," +
+                "\"channelNum\": " + channelNum +
+                "}";
+    }
 }
 
