@@ -1,17 +1,22 @@
 package org.traccar;
 
+import com.squareup.okhttp.*;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 
+import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import java.net.InetSocketAddress;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.traccar.database.StatisticsManager;
@@ -22,6 +27,14 @@ import org.traccar.model.Position;
 public class MainEventHandler
         extends ChannelInboundHandlerAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainEventHandler.class);
+//    private static final String TOKEN_URL = "https://dev-api.flocksafety.com/oauth/token";
+//    private static final String API_URL = "https://api.flocksafety.com/api/v3/geo/subjects";
+//    private static final String CLIENT_ID = "MTDnMK8cptciglwiCkrSWCkns7qoLEdX";
+//    private static final String CLIENT_SECRET = "iLVUY_PLT5TEq2zAOjOLsdvsTQZfmr9Yf8DHv3fJvo_nQx2bmEfEsUlyTsehH94Y";
+//    private static final String AUDIENCE = "com.flocksafety.integrations.dev";
+//    private static String accessToken = null;
+//    private static long tokenExpiryTime = 0;
+//    private static final OkHttpClient client = new OkHttpClient();
 
     private static final String DEFAULT_LOGGER_ATTRIBUTES = "time,position,speed,course,accuracy,result";
 
@@ -92,6 +105,40 @@ public class MainEventHandler
                 }
             }
 
+//            // Making the HTTP call asynchronously
+//            CompletableFuture.runAsync(() -> {
+//                OkHttpClient client = new OkHttpClient();
+//                MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+//                RequestBody body = RequestBody.create(mediaType, "grant_type=client_credentials&client_id=MTDnMK8cptciglwiCkrSWCkns7qoLEdX&client_secret=iLVUY_PLT5TEq2zAOjOLsdvsTQZfmr9Yf8DHv3fJvo_nQx2bmEfEsUlyTsehH94Y&audience=com.flocksafety.integrations.dev");
+//                Request request = new Request.Builder()
+//                        .url("https://dev-api.flocksafety.com/oauth/token")
+//                        .post(body)
+//                        .addHeader("accept", "application/json")
+//                        .addHeader("content-type", "application/x-www-form-urlencoded")
+//                        .build();
+//
+//                Response response = null;
+//                try {
+//                    response = client.newCall(request).execute();
+//                    String responseBody = response.body().string();
+//                    LOGGER.info("ResponseBody: {}", responseBody);
+//                    JSONObject jsonResponse = new JSONObject(responseBody);
+//                    LOGGER.info("JSONResponseBody: {}", jsonResponse);
+//                    if (response.isSuccessful()) {
+//                        String accessToken = jsonResponse.optString("access_token", "");
+//
+//                        if (!accessToken.isEmpty()) {
+//                            LOGGER.info("Successfully extracted access_token: {}", accessToken);
+//                        } else {
+//                            LOGGER.warn("access_token not found in response");
+//                        }
+//                    }
+//                } catch (IOException e) {
+//                    LOGGER.error("Error in API Call: ", e);
+//                }
+//            });
+//            CompletableFuture<Void> voidCompletableFuture = sendApiRequestAsync(position.getLatitude(), position.getLongitude());
+
 
             LOGGER.info(builder.toString());
 
@@ -149,6 +196,82 @@ public class MainEventHandler
         if (!(channel instanceof io.netty.channel.socket.DatagramChannel))
             channel.close();
     }
+
+
+//    private static synchronized void fetchAccessToken() {
+//        if (System.currentTimeMillis() < tokenExpiryTime) {
+//            LOGGER.info("Using cached token");
+//            return;
+//        }
+//        LOGGER.info("Fetching new access token");
+//
+//        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+//        RequestBody body = RequestBody.create(mediaType, "grant_type=client_credentials&client_id=" + CLIENT_ID + "&client_secret=" + CLIENT_SECRET + "&audience=" + AUDIENCE);
+//        Request request = new Request.Builder()
+//                .url(TOKEN_URL)
+//                .post(body)
+//                .addHeader("accept", "application/json")
+//                .addHeader("content-type", "application/x-www-form-urlencoded")
+//                .build();
+//
+//        Response response = null;
+//        try {
+//            response = client.newCall(request).execute();
+//            if (response.isSuccessful() && response.body() != null) {
+//                String responseBody = response.body().string();
+//                JSONObject jsonResponse = new JSONObject(responseBody);
+//                accessToken = jsonResponse.optString("access_token", "");
+//                int expiresIn = jsonResponse.optInt("expires_in", 3600);
+//                tokenExpiryTime = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(expiresIn);
+//                LOGGER.info("New token fetched and expires in: {} seconds", expiresIn);
+//            } else {
+//                LOGGER.error("Failed to fetch access token, response: {}", response.body() != null ? response.body().string() : "null");
+//            }
+//        }catch (Exception e) {
+//            LOGGER.error("Error in fetching token: ", e);
+//        }
+//
+//
+//    }
+//
+//    public static CompletableFuture<Void> sendApiRequestAsync(double latitude, double longitude) {
+//        return CompletableFuture.runAsync(() -> {
+//            fetchAccessToken();
+//            if(accessToken == null || accessToken.isEmpty()) {
+//                LOGGER.error("Access Token Unavailable");
+//                return;
+//            }
+//            LOGGER.info("Got Access token in sendAPI: {}, with lat: {}, long: {}", accessToken, latitude, longitude);
+//        });
+//        return CompletableFuture.runAsync(() -> {
+//            fetchAccessToken();
+//            if (accessToken == null || accessToken.isEmpty()) {
+//                LOGGER.error("Access token is unavailable, cannot proceed with request");
+//                return;
+//            }
+//
+//            MediaType mediaType = MediaType.parse("application/json");
+//            String jsonBody = String.format("{\"subjectType\":\"vehicle\",\"externalId\":\"generated UUID\",\"deviceStatus\":null,\"isRecording\":false,\"isLawEnforcement\":false,\"latitude\":%f,\"longitude\":%f}", latitude, longitude);
+//            RequestBody body = RequestBody.create(mediaType, jsonBody);
+//            Request request = new Request.Builder()
+//                    .url(API_URL)
+//                    .put(body)
+//                    .addHeader("accept", "application/json")
+//                    .addHeader("content-type", "application/json")
+//                    .addHeader("authorization", "Bearer " + accessToken)
+//                    .build();
+//
+//            try (Response response = client.newCall(request).execute()) {
+//                if (response.isSuccessful() && response.body() != null) {
+//                    LOGGER.info("API Response: {}", response.body().string());
+//                } else {
+//                    LOGGER.error("API Request failed: {}", response.body() != null ? response.body().string() : "null");
+//                }
+//            } catch (IOException e) {
+//                LOGGER.error("Error in API Call", e);
+//            }
+//        });
+//    }
 }
 
 

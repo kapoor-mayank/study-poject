@@ -1,41 +1,28 @@
-/*    */ package org.traccar.protocol;
-/*    */ 
-/*    */ import io.netty.channel.ChannelHandler;
-/*    */ import io.netty.handler.codec.string.StringDecoder;
-/*    */ import io.netty.handler.codec.string.StringEncoder;
-/*    */ import org.traccar.BaseProtocol;
-/*    */ import org.traccar.CharacterDelimiterFrameDecoder;
-/*    */ import org.traccar.PipelineBuilder;
-/*    */ import org.traccar.Protocol;
-/*    */ import org.traccar.TrackerServer;
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ 
-/*    */ public class M2cProtocol
-/*    */   extends BaseProtocol
-/*    */ {
-/*    */   public M2cProtocol() {
-/* 28 */     addServer(new TrackerServer(false, getName())
-/*    */         {
-/*    */           protected void addProtocolHandlers(PipelineBuilder pipeline) {
-/* 31 */             pipeline.addLast((ChannelHandler)new CharacterDelimiterFrameDecoder(32768, ']'));
-/* 32 */             pipeline.addLast((ChannelHandler)new StringDecoder());
-/* 33 */             pipeline.addLast((ChannelHandler)new StringEncoder());
-/* 34 */             pipeline.addLast((ChannelHandler)new M2cProtocolDecoder((Protocol)M2cProtocol.this));
-/*    */           }
-/*    */         });
-/*    */   }
-/*    */ }
+package org.traccar.protocol;
+
+import io.netty.channel.ChannelHandler;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+import org.traccar.BaseProtocol;
+import org.traccar.CharacterDelimiterFrameDecoder;
+import org.traccar.PipelineBuilder;
+import org.traccar.Protocol;
+import org.traccar.TrackerServer;
+
+
+public class M2cProtocol
+        extends BaseProtocol {
+    public M2cProtocol() {
+        addServer(new TrackerServer(false, getName()) {
+            protected void addProtocolHandlers(PipelineBuilder pipeline) {
+                pipeline.addLast((ChannelHandler) new CharacterDelimiterFrameDecoder(32768, ']'));
+                pipeline.addLast((ChannelHandler) new StringDecoder());
+                pipeline.addLast((ChannelHandler) new StringEncoder());
+                pipeline.addLast((ChannelHandler) new M2cProtocolDecoder((Protocol) M2cProtocol.this));
+            }
+        });
+    }
+}
 
 
 /* Location:              C:\User\\user\Documents\Ensurity Mobile [Client]\Latest App\traccar\tracker-server.jar!\org\traccar\protocol\M2cProtocol.class

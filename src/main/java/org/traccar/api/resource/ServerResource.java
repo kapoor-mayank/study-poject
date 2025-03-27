@@ -1,15 +1,14 @@
 package org.traccar.api.resource;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 import javax.annotation.security.PermitAll;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.traccar.Context;
 import org.traccar.api.BaseResource;
 import org.traccar.helper.LogAction;
@@ -22,12 +21,25 @@ import org.traccar.model.Server;
 @Consumes({"application/json"})
 public class ServerResource
         extends BaseResource {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerResource.class);
     @PermitAll
     @GET
     public Server get() throws SQLException {
         return Context.getPermissionsManager().getServer();
     }
-
+//    @PermitAll
+//    @POST
+//    @Path("process")
+//    public Response processJson(List<Map<String, Object>> data) {
+//
+//        LOGGER.info("JSON Object: {}", data);
+//        // Iterate and process each JSON object dynamically
+//        for (Map<String, Object> jsonObject : data) {
+//            LOGGER.info("JSON Object Iteration: {}", jsonObject);
+//        }
+//        return Response.ok("Data processed successfully").build();
+//    }
     @PUT
     public Response update(Server entity) throws SQLException {
         Context.getPermissionsManager().checkAdmin(getUserId());

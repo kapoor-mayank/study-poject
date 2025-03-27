@@ -117,8 +117,8 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
 
         List<Position> positions = new LinkedList<>();
 //        LOGGER.info("Positions :: {}", positions);
-        Long sequenceNo = null;
-        String uniqueId = null;
+//        Long sequenceNo = null;
+//        String uniqueId = null;
         //LOGGER.info("The HEX data is :: toString :: {}, hexDump :: {}", hexData, testHex);
         while (buf.isReadable()) {
             int recordEnd = buf.readerIndex() + buf.readUnsignedShortLE();
@@ -127,9 +127,9 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
             Position position = new Position(getProtocolName());
 //            LOGGER.info("Position Before Population :: {}", position);
             position.setDeviceId(deviceSession.getDeviceId());
-            uniqueId = Context.getIdentityManager().getById(position.getDeviceId()).getUniqueId();
+//            uniqueId = Context.getIdentityManager().getById(position.getDeviceId()).getUniqueId();
             position.set("index", Long.valueOf(buf.readUnsignedIntLE()));
-            sequenceNo = (Long) position.getAttributes().get("index");
+//            sequenceNo = (Long) position.getAttributes().get("index");
 //            LOGGER.info("DeviceId: {}, UniqueId: {}, Sequence Number: {}", position.getDeviceId(), uniqueId, sequenceNo);
             position.setDeviceTime(new Date(1356998400000L + buf.readUnsignedIntLE() * 1000L));
 
@@ -226,18 +226,18 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
 //                LOGGER.info("Inside DmtProtocolDecoder, Position Object decoded: {}", position);
 //            }
 //        }
-        String decodedData = positions.toString();
-        // Asynchronously store the data
-        Long finalIndex = sequenceNo;
-        String finalUniqueId = uniqueId;
-        executorService.submit(() -> {
-            try {
-                hexDataStorage.storeHexAndDecodedData(hexData, decodedData, finalIndex, finalUniqueId);
-            } catch (Exception e) {
-                // Log any errors during the database operation
-                LOGGER.error("Error storing data", e);
-            }
-        });
+//        String decodedData = positions.toString();
+//        // Asynchronously store the data
+//        Long finalIndex = sequenceNo;
+//        String finalUniqueId = uniqueId;
+//        executorService.submit(() -> {
+//            try {
+//                hexDataStorage.storeHexAndDecodedData(hexData, decodedData, finalIndex, finalUniqueId);
+//            } catch (Exception e) {
+//                // Log any errors during the database operation
+//                LOGGER.error("Error storing data", e);
+//            }
+//        });
         return positions.isEmpty() ? null : positions;
     }
 
