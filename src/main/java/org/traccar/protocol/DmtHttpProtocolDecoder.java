@@ -16,15 +16,15 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.traccar.BaseHttpProtocolDecoder;
-import org.traccar.DeviceSession;
-import org.traccar.Protocol;
+import org.traccar.*;
 import org.traccar.helper.BitUtil;
 import org.traccar.helper.UnitsConverter;
 import org.traccar.model.Position;
@@ -32,26 +32,43 @@ import org.traccar.model.Position;
 
 public class DmtHttpProtocolDecoder
         extends BaseHttpProtocolDecoder {
-    private static final Logger log = LoggerFactory.getLogger(DmtHttpProtocolDecoder.class);
 
+    private final ExecutorService executorService = Executors.newFixedThreadPool(5); // Thread pool for async tasks
+    private static final HexDataStorageHandler hexDataStorage = new HexDataStorageHandler(); // Initialize storage helper
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DmtHttpProtocolDecoder.class);
     public DmtHttpProtocolDecoder(Protocol protocol) {
         super(protocol);
     }
 
 
     protected Object decode(Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
-        Object result;
+        Position result;
         FullHttpRequest request = (FullHttpRequest) msg;
 
         JsonObject root = Json.createReader(new StringReader(request.content().toString(StandardCharsets.US_ASCII))).readObject();
-        log.info("DmtHTTPProtocolDecoder JSON Received :: {}", root.toString());
+        LOGGER.info("Received data: " + root.toString());
 
         if (root.containsKey("device")) {
-            result = (Position) decodeEdge(channel, remoteAddress, root);
+            result = decodeEdge(channel, remoteAddress, root);
         } else {
-            result = (Position) decodeTraditional(channel, remoteAddress, root);
+            result = (Position)decodeTraditional(channel, remoteAddress, root);
         }
 
+        Integer sequenceNo = (Integer) result.getAttributes().get("index");
+        String uniqueId = Context.getIdentityManager().getById(result.getDeviceId()).getUniqueId();
+        String decodedData = result.toString();
+        // Asynchronously store the data
+        Long finalIndex = Long.valueOf(sequenceNo);
+        String finalUniqueId = uniqueId;
+        executorService.submit(() -> {
+            try {
+                hexDataStorage.storeHexAndDecodedData(root.toString(), decodedData, finalIndex, finalUniqueId);
+            } catch (Exception e) {
+                // Log any errors during the database operation
+                LOGGER.error("Error storing data", e);
+            }
+        });
         sendResponse(channel, (result != null) ? HttpResponseStatus.OK : HttpResponseStatus.BAD_REQUEST);
         return result;
     }
@@ -125,44 +142,15 @@ public class DmtHttpProtocolDecoder
                             position.set("solarPower", Double.valueOf(adc.getInt("5") * 0.001D));
                         }
                         break;
-                    case 25:    //Handle WiFi realted data
-                        JsonArray aps = field.getJsonArray("APs");
-                        for (int k = 0; k < aps.size(); k++) {
-                            JsonObject ap = aps.getJsonObject(k);
-                            position.set("ap" + k + "_mac", ap.getString("MAC"));
-                            position.set("ap" + k + "_sig", ap.getInt("Sig"));
-                            position.set("ap" + k + "_ch", ap.getInt("Ch"));
-                        }
-                        break;
-                    case 36: // Handle Towers information
-                        JsonArray towers = field.getJsonArray("Towers");
-                        for (int k = 0; k < towers.size(); k++) {
-                            JsonObject tower = towers.getJsonObject(k);
-                            position.set("tower" + k + "_srv", tower.getBoolean("SRV", false));
-                            position.set("tower" + k + "_nw", tower.getInt("NW", -1));
-                            position.set("tower" + k + "_cid", tower.getInt("CID", -1));
-                            position.set("tower" + k + "_lac", tower.getInt("LAC", -1));
-                            position.set("tower" + k + "_mcc", tower.getInt("MCC", -1));
-                            position.set("tower" + k + "_mnc", tower.getInt("MNC", -1));
-                            position.set("tower" + k + "_earfcn", tower.getInt("EARFCN", -1));
-                            position.set("tower" + k + "_pcid", tower.getInt("PCID", -1));
-                            position.set("tower" + k + "_rsrp", tower.getInt("RSRP", -1));
-                            position.set("tower" + k + "_rsrq", tower.getInt("RSRQ", -1));
-                            position.set("tower" + k + "_ta", tower.getInt("TA", -1));
-                            if (tower.containsKey("DeltaT")) {
-                                position.set("tower" + k + "_deltat", tower.getInt("DeltaT"));
-                            }
-                        }
-                        break;
                 }
+
+
             }
             positions.add(position);
-            log.info("HTTP DECODER: {}", positions.toString());
         }
 
         return positions;
     }
-
 
 
     private Position decodeEdge(Channel channel, SocketAddress remoteAddress, JsonObject root) {
@@ -174,7 +162,11 @@ public class DmtHttpProtocolDecoder
         }
 
         Position position = new Position(getProtocolName());
+//        String imei = device.getString("imei"); // Extract IMEI directly
+//        position.setDeviceId(Long.parseLong(imei)); // Convert IMEI to long and set deviceId
         position.setDeviceId(deviceSession.getDeviceId());
+        LOGGER.info("IMEI from DeviceSession: " + deviceSession.getDeviceId());
+        LOGGER.info("IMEI from JsonObject: " + device.getString("imei"));
 
         Date time = new Date(OffsetDateTime.parse(root.getString("date")).toInstant().toEpochMilli());
 
@@ -233,3 +225,9 @@ public class DmtHttpProtocolDecoder
         return position;
     }
 }
+
+
+/* Location:              C:\User\\user\Documents\Ensurity Mobile [Client]\Latest App\traccar\tracker-server.jar!\org\traccar\protocol\DmtHttpProtocolDecoder.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

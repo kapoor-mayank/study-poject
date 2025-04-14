@@ -28,6 +28,28 @@ import org.traccar.helper.UnitsConverter;
 import org.traccar.model.Position;
 import org.traccar.model.WiFiData;
 
+/**
+ * The DmtProtocolDecoder class is responsible for decoding and parsing messages
+ * from the DMT device protocol. It extends functionality from the base protocol
+ * decoder to handle specific DMT protocol message types and formats.
+ *
+ * This decoder supports the following message types:
+ * - MSG_HELLO
+ * - MSG_HELLO_RESPONSE
+ * - MSG_DATA_RECORD
+ * - MSG_COMMIT
+ * - MSG_COMMIT_RESPONSE
+ * - MSG_DATA_RECORD_64
+ * - MSG_CANNED_REQUEST_1
+ * - MSG_CANNED_RESPONSE_1
+ * - MSG_CANNED_REQUEST_2
+ * - MSG_CANNED_RESPONSE_2
+ *
+ * The decoding process includes handling fixed 64-bit data record parsing, standard
+ * message parsing, processing Wi-Fi data scans, and cell tower scan data interpretation.
+ * The decoder interacts with a communication channel, processes incoming data, and
+ * sends appropriate responses or produces positional and event data when necessary.
+ */
 public class DmtProtocolDecoder extends BaseProtocolDecoder {
     private static final Logger LOGGER = LoggerFactory.getLogger(DmtProtocolDecoder.class);
     private final ExecutorService executorService = Executors.newFixedThreadPool(5); // Thread pool for async tasks
@@ -117,8 +139,8 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
 
         List<Position> positions = new LinkedList<>();
 //        LOGGER.info("Positions :: {}", positions);
-//        Long sequenceNo = null;
-//        String uniqueId = null;
+        Long sequenceNo = null;
+        String uniqueId = null;
         //LOGGER.info("The HEX data is :: toString :: {}, hexDump :: {}", hexData, testHex);
         while (buf.isReadable()) {
             int recordEnd = buf.readerIndex() + buf.readUnsignedShortLE();
@@ -127,9 +149,9 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
             Position position = new Position(getProtocolName());
 //            LOGGER.info("Position Before Population :: {}", position);
             position.setDeviceId(deviceSession.getDeviceId());
-//            uniqueId = Context.getIdentityManager().getById(position.getDeviceId()).getUniqueId();
+            uniqueId = Context.getIdentityManager().getById(position.getDeviceId()).getUniqueId();
             position.set("index", Long.valueOf(buf.readUnsignedIntLE()));
-//            sequenceNo = (Long) position.getAttributes().get("index");
+            sequenceNo = (Long) position.getAttributes().get("index");
 //            LOGGER.info("DeviceId: {}, UniqueId: {}, Sequence Number: {}", position.getDeviceId(), uniqueId, sequenceNo);
             position.setDeviceTime(new Date(1356998400000L + buf.readUnsignedIntLE() * 1000L));
 
@@ -141,9 +163,9 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
 //            LOGGER.info("DmtProtocolDecoder - The value of event is: {}, multipying it by 2: {}", Integer.valueOf(event), 2 * Integer.valueOf(event));
             while (buf.readerIndex() < recordEnd) {
                 int fieldId = buf.readUnsignedByte();
-                LOGGER.info("Field ID: {}", fieldId);
+//                LOGGER.info("Field ID: {}", fieldId);
                 int fieldLength = buf.readUnsignedByte();
-                LOGGER.info("Field Length: {}", fieldLength);
+//                LOGGER.info("Field Length: {}", fieldLength);
                 int fieldEnd = buf.readerIndex() + ((fieldLength == 255) ? buf.readUnsignedShortLE() : fieldLength);
                 if (fieldId == 0) {
                     position.setFixTime(new Date(1356998400000L + buf.readUnsignedIntLE() * 1000L));
@@ -226,18 +248,18 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
 //                LOGGER.info("Inside DmtProtocolDecoder, Position Object decoded: {}", position);
 //            }
 //        }
-//        String decodedData = positions.toString();
-//        // Asynchronously store the data
-//        Long finalIndex = sequenceNo;
-//        String finalUniqueId = uniqueId;
-//        executorService.submit(() -> {
-//            try {
-//                hexDataStorage.storeHexAndDecodedData(hexData, decodedData, finalIndex, finalUniqueId);
-//            } catch (Exception e) {
-//                // Log any errors during the database operation
-//                LOGGER.error("Error storing data", e);
-//            }
-//        });
+        String decodedData = positions.toString();
+        // Asynchronously store the data
+        Long finalIndex = sequenceNo;
+        String finalUniqueId = uniqueId;
+        executorService.submit(() -> {
+            try {
+                hexDataStorage.storeHexAndDecodedData(hexData, decodedData, finalIndex, finalUniqueId);
+            } catch (Exception e) {
+                // Log any errors during the database operation
+                LOGGER.error("Error storing data", e);
+            }
+        });
         return positions.isEmpty() ? null : positions;
     }
 
