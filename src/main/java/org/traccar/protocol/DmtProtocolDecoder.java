@@ -243,11 +243,11 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
             if (position.getFixTime() == null) getLastLocation(position, position.getDeviceTime());
             if (event != 21) positions.add(position);
         }
-//        if (!positions.isEmpty()) {
-//            for (Position position : positions) {
-//                LOGGER.info("Inside DmtProtocolDecoder, Position Object decoded: {}", position);
-//            }
-//        }
+        if (!positions.isEmpty()) {
+            for (Position position : positions) {
+                LOGGER.info("Position Object decoded: {}", position);
+            }
+        }
         String decodedData = positions.toString();
         // Asynchronously store the data
         Long finalIndex = sequenceNo;
