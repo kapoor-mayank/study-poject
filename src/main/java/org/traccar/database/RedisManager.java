@@ -3,7 +3,7 @@ package org.traccar.database;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.Date;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +11,8 @@ import org.traccar.Context;
 import org.traccar.model.Device;
 import org.traccar.model.Position;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.StreamEntryID;
+import redis.clients.jedis.params.XAddParams;
 
 
 public class RedisManager {
@@ -31,6 +33,22 @@ public class RedisManager {
         String value = this.objectMapper.writeValueAsString(position);
         try (Jedis jedis = new Jedis(Context.getConfig().getString("redis.database"))) {
             jedis.lpush(key, new String[]{value});
+
+
+            // Create stream entry parameters (auto-generate the ID with `*`)
+            XAddParams params = XAddParams.xAddParams().id(StreamEntryID.NEW_ENTRY);
+            // Create the stream data
+            Map<String, String> streamData = new HashMap<>();
+            streamData.put(key, objectMapper.writeValueAsString(Collections.singletonList(position)));
+
+            // Push the data to the stream
+            jedis.xadd("positions.stream", params, streamData);
+
+//            Map<String, String> streamData = new HashMap<>();
+//            streamData.put(key, objectMapper.writeValueAsString(Collections.singletonList(position)));
+//
+//// Use "*" to auto-generate the ID for the stream entry
+//            jedis.xadd("positions.stream", "*", streamData);
         }
     }
 
