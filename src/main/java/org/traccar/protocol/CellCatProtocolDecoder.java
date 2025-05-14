@@ -33,10 +33,11 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
     protected Object decode(Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
         LOGGER.info("Inside CellCatProtocolDecode");
         ByteBuf buf = (ByteBuf) msg;
-        if (buf.readableBytes() != 30 || buf.readUnsignedByte() != 0x55 || !validateChecksum(buf)) {
+        if (buf.readableBytes() != 30 || buf.getUnsignedByte(0) != 0x55 || !validateChecksum(buf)) {
             LOGGER.info("Failing check");
             return null;
         }
+
 
         int command = buf.getUnsignedByte(1);
         LOGGER.info("Command: {}", command);
