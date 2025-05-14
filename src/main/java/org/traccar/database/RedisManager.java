@@ -11,8 +11,8 @@ import org.traccar.Context;
 import org.traccar.model.Device;
 import org.traccar.model.Position;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.StreamEntryID;
-import redis.clients.jedis.params.XAddParams;
+//import redis.clients.jedis.StreamEntryID;
+//import redis.clients.jedis.params.XAddParams;
 
 
 public class RedisManager {
@@ -35,14 +35,14 @@ public class RedisManager {
             jedis.lpush(key, new String[]{value});
 
 
-            // Create stream entry parameters (auto-generate the ID with `*`)
-            XAddParams params = XAddParams.xAddParams().id(StreamEntryID.NEW_ENTRY);
-            // Create the stream data
-            Map<String, String> streamData = new HashMap<>();
-            streamData.put(key, objectMapper.writeValueAsString(Collections.singletonList(position)));
-
-            // Push the data to the stream
-            jedis.xadd("positions.stream", params, streamData);
+//            // Create stream entry parameters (auto-generate the ID with `*`)
+//            XAddParams params = XAddParams.xAddParams().id(StreamEntryID.NEW_ENTRY);
+//            // Create the stream data
+//            Map<String, String> streamData = new HashMap<>();
+//            streamData.put(key, objectMapper.writeValueAsString(Collections.singletonList(position)));
+//
+//            // Push the data to the stream
+//            jedis.xadd("positions.stream", params, streamData);
 
 //            Map<String, String> streamData = new HashMap<>();
 //            streamData.put(key, objectMapper.writeValueAsString(Collections.singletonList(position)));
