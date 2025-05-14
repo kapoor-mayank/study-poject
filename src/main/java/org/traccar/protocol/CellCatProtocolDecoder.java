@@ -26,6 +26,7 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
         int sum = 0;
         for (int i = 1; i <= 28; i++) sum += buf.getUnsignedByte(i);
         int checksum = (sum ^ 0xFF) + 1;
+        LOGGER.info("Checksum: {}", checksum);
         return checksum == buf.getUnsignedByte(29);
     }
 
