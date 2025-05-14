@@ -75,9 +75,12 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
 
     private Object decodeRegistration(Channel channel, SocketAddress remoteAddress, ByteBuf buf) {
         buf.readerIndex(6); // skip header, command, and 4-byte serial to reach IMEI
-        ByteBuf idBuf = buf.readSlice(15);
-        String deviceId = idBuf.toString(StandardCharsets.US_ASCII);
-        LOGGER.info("Raw Device ID HEX: {}", ByteBufUtil.hexDump(idBuf));
+
+        // Log the raw bytes of the registration packet to see what we are dealing with
+        ByteBuf rawDeviceIdBytes = buf.readSlice(15);
+        LOGGER.info("Raw Device ID Bytes: {}", ByteBufUtil.hexDump(rawDeviceIdBytes)); // This will show the raw bytes in hexadecimal format
+
+        String deviceId = rawDeviceIdBytes.toString(StandardCharsets.US_ASCII);
         LOGGER.info("Received registration ID in 0x01 command: {}", deviceId);
 
         getDeviceSession(channel, remoteAddress, deviceId);
