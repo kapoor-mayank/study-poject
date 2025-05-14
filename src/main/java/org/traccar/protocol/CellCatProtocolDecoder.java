@@ -74,27 +74,46 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
     }
 
     private Object decodeRegistration(Channel channel, SocketAddress remoteAddress, ByteBuf buf) {
-        buf.readerIndex(6); // skip header, command, and 4-byte serial to reach IMEI
+        buf.readerIndex(2);
 
-        // Log the raw bytes of the registration packet to see what we are dealing with
+        // Read and store the actual 4-byte serial number
+        ByteBuf serialBytes = buf.readSlice(4);
+        byte[] serial = new byte[4];
+        serialBytes.getBytes(0, serial);
+
+        // Read IMEI from bytes [6..20]
         ByteBuf rawDeviceIdBytes = buf.readSlice(15);
-        LOGGER.info("Raw Device ID Bytes: {}", ByteBufUtil.hexDump(rawDeviceIdBytes)); // This will show the raw bytes in hexadecimal format
-
+        LOGGER.info("Raw Device ID Bytes: {}", ByteBufUtil.hexDump(rawDeviceIdBytes));
         String deviceId = rawDeviceIdBytes.toString(StandardCharsets.US_ASCII);
         LOGGER.info("Received registration ID in 0x01 command: {}", deviceId);
 
         getDeviceSession(channel, remoteAddress, deviceId);
 
         if (channel != null) {
-            ByteBuf response = Unpooled.buffer();
-            response.writeByte(MSG_ID_PACKET);
-            response.writeByte(0x01); // success
+            ByteBuf response = Unpooled.buffer(30);
+            response.writeByte(0x55);         // [0] Start byte
+            response.writeByte(0x02);         // [1] Command code (ACK)
+            response.writeBytes(serial);      // [2–5] Echo back actual 4-byte serial number
+            response.writeByte(0x01);         // [6] Result code (success)
+            response.writeZero(20);           // [7–26] Reserved
+            response.writeByte(0x03);         // [27] Echo: message count
+            response.writeByte(0x00);         // [28] Echo: session type
+
+            // Calculate checksum for bytes [1..28]
+            int sum = 0;
+            for (int i = 1; i <= 28; i++) {
+                sum += response.getUnsignedByte(i);
+            }
+            int checksum = ((sum ^ 0xFF) + 1) & 0xFF;
+            response.writeByte(checksum);     // [29] Checksum
+
+            LOGGER.info("Sending ACK (0x02) HEX: {}", ByteBufUtil.hexDump(response));
             channel.writeAndFlush(new NetworkMessage(response, remoteAddress));
-            LOGGER.info("Sent registration ACK for ID: {}", deviceId);
         }
 
         return null;
     }
+
 
     private List<Position> decodeGps(Channel channel, SocketAddress remoteAddress, ByteBuf buf) {
         DeviceSession deviceSession = getDeviceSession(channel, remoteAddress);
