@@ -74,6 +74,8 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
         LOGGER.info("Command: {}", command);
 
         switch (command) {
+            case MSG_ID_PACKET:
+                return decodeRegistration(channel, remoteAddress, buf);
             case MSG_GPS:
                 return decodeGps(channel, remoteAddress, buf);
             case MSG_ALARM:
@@ -84,6 +86,24 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
                 LOGGER.warn("Unknown command: {}", command);
                 return null;
         }
+    }
+
+    private Object decodeRegistration(Channel channel, SocketAddress remoteAddress, ByteBuf buf) {
+        buf.readerIndex(2); // skip header + command
+        String deviceId = buf.readSlice(15).toString(StandardCharsets.US_ASCII);
+        LOGGER.info("Received registration ID in 0x01 command: {}", deviceId);
+
+        getDeviceSession(channel, remoteAddress, deviceId);
+
+        if (channel != null) {
+            ByteBuf response = Unpooled.buffer();
+            response.writeByte(MSG_ID_PACKET);
+            response.writeByte(0x01); // success
+            channel.writeAndFlush(new NetworkMessage(response, remoteAddress));
+            LOGGER.info("Sent registration ACK for ID: {}", deviceId);
+        }
+
+        return null; // No position yet
     }
 
     private List<Position> decodeGps(Channel channel, SocketAddress remoteAddress, ByteBuf buf) {
