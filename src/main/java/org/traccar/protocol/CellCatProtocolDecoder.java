@@ -170,19 +170,27 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
         Position position = new Position(getProtocolName());
         position.setDeviceId(deviceSession.getDeviceId());
 
-        buf.readerIndex(2);
-        buf.skipBytes(4); // serial
-        position.set("packetNumber", buf.readUnsignedShort());
-        position.set("batteryVoltage", buf.readUnsignedShort());
-        position.set("batteryLevel", buf.readUnsignedByte());
-        position.set("externalVoltage", buf.readUnsignedShort());
-        position.set("temperature", buf.readShort() * 0.1);
-        buf.skipBytes(2);
-        position.set("rssi", buf.readShort());
-        position.set("aband", buf.readUnsignedByte());
-        position.set("earfcn", buf.readUnsignedShort());
-        position.set("retryCount", buf.readUnsignedByte());
+        buf.readerIndex(6);  // Start after 0x55, command, and 4-byte serial (0-5)
+
+        try {
+            position.set("packetNumber", buf.readUnsignedShort());       // [6–7]
+            position.set("batteryVoltage", buf.readUnsignedShort());     // [8–9]
+            position.set("batteryLevel", buf.readUnsignedByte());        // [10]
+            position.set("externalVoltage", buf.readUnsignedShort());    // [11–12]
+            position.set("temperature", buf.readShort() * 0.1);          // [13–14]
+            buf.skipBytes(2);                                            // [15–16] not used
+            position.set("rssi", (double) buf.readShort());              // [17–18]
+            position.set("aband", buf.readUnsignedByte());               // [19]
+            position.set("earfcn", buf.readUnsignedShort());             // [20–21]
+            position.set("retryCount", buf.readUnsignedByte());          // [22]
+            buf.skipBytes(6);                                            // [23–28] not used
+        } catch (Exception e) {
+            LOGGER.error("Error decoding status message: {}", ByteBufUtil.hexDump(buf));
+            LOGGER.error("Exception: ", e);
+            return null;
+        }
 
         return Collections.singletonList(position);
     }
+
 }
