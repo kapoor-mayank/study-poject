@@ -169,6 +169,9 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
 
         Position position = new Position(getProtocolName());
         position.setDeviceId(deviceSession.getDeviceId());
+        // Use current system time if GPS time is not available
+        position.setFixTime(new Date(System.currentTimeMillis()));
+
 
         buf.readerIndex(6);  // Start after 0x55, command, and 4-byte serial (0-5)
 
