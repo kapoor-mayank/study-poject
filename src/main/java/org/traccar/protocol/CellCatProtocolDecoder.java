@@ -2,6 +2,7 @@ package org.traccar.protocol;
 import org.traccar.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,29 +41,13 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
         return checksum == buf.getUnsignedByte(29);
     }
 
-    private String readId(ByteBuf buf) {
-        return buf.readSlice(15).toString(StandardCharsets.US_ASCII);
-    }
-
     @Override
     protected Object decode(Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
         ByteBuf buf = (ByteBuf) msg;
         LOGGER.info("Inside CellCatProtocolDecode");
 
-        if (buf.readableBytes() == 17 && buf.getUnsignedByte(0) == 0x55 && buf.getUnsignedByte(1) == MSG_ID_PACKET) {
-            buf.skipBytes(2); // Skip header and type
-            String deviceId = readId(buf);
-            LOGGER.info("Received registration ID: {}", deviceId);
-            getDeviceSession(channel, remoteAddress, deviceId);
-
-            if (channel != null) {
-                ByteBuf response = Unpooled.buffer();
-                response.writeByte(MSG_ID_PACKET);
-                response.writeByte(0x01); // Acknowledge OK
-                channel.writeAndFlush(new NetworkMessage(response, remoteAddress));
-                LOGGER.info("Sent registration ACK for ID: {}", deviceId);
-            }
-            return null;
+        if (buf.readableBytes() == 30 && buf.getUnsignedByte(0) == 0x55 && buf.getUnsignedByte(1) == MSG_ID_PACKET) {
+            return decodeRegistration(channel, remoteAddress, buf);
         }
 
         if (buf.readableBytes() != 30 || buf.getUnsignedByte(0) != 0x55 || !validateChecksum(buf)) {
@@ -89,8 +74,10 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
     }
 
     private Object decodeRegistration(Channel channel, SocketAddress remoteAddress, ByteBuf buf) {
-        buf.readerIndex(2); // skip header + command
-        String deviceId = buf.readSlice(15).toString(StandardCharsets.US_ASCII);
+        buf.readerIndex(4); // skip header, command, and 2 reserved bytes
+        ByteBuf idBuf = buf.readSlice(15);
+        String deviceId = idBuf.toString(StandardCharsets.US_ASCII);
+        LOGGER.info("Raw Device ID HEX: {}", ByteBufUtil.hexDump(idBuf));
         LOGGER.info("Received registration ID in 0x01 command: {}", deviceId);
 
         getDeviceSession(channel, remoteAddress, deviceId);
@@ -103,7 +90,7 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
             LOGGER.info("Sent registration ACK for ID: {}", deviceId);
         }
 
-        return null; // No position yet
+        return null;
     }
 
     private List<Position> decodeGps(Channel channel, SocketAddress remoteAddress, ByteBuf buf) {
