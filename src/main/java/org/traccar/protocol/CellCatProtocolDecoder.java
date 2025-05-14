@@ -24,11 +24,14 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
 
     private boolean validateChecksum(ByteBuf buf) {
         int sum = 0;
-        for (int i = 1; i <= 28; i++) sum += buf.getUnsignedByte(i);
-        int checksum = (sum ^ 0xFF) + 1;
-        LOGGER.info("Checksum: {}", checksum);
+        for (int i = 1; i <= 28; i++) {
+            sum += buf.getUnsignedByte(i);
+        }
+        int checksum = ((sum ^ 0xFF) + 1) & 0xFF; // <-- force wrap to 8-bit
+        LOGGER.info("Checksum (calculated): {}, Expected: {}", checksum, buf.getUnsignedByte(29));
         return checksum == buf.getUnsignedByte(29);
     }
+
 
     @Override
     protected Object decode(Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
