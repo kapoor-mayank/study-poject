@@ -74,7 +74,7 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
     }
 
     private Object decodeRegistration(Channel channel, SocketAddress remoteAddress, ByteBuf buf) {
-        buf.readerIndex(4); // skip header, command, and 2 reserved bytes
+        buf.readerIndex(6); // skip header, command, and 4-byte serial to reach IMEI
         ByteBuf idBuf = buf.readSlice(15);
         String deviceId = idBuf.toString(StandardCharsets.US_ASCII);
         LOGGER.info("Raw Device ID HEX: {}", ByteBufUtil.hexDump(idBuf));
