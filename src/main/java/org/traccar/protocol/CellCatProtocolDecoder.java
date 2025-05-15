@@ -243,7 +243,7 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
         if (deviceSession == null) return null;
         Position position = new Position(getProtocolName());
         position.setDeviceId(deviceSession.getDeviceId());
-
+        position.setFixTime(new Date());
         buf.readerIndex(2);
         for (int i = 2; i <= 28; i++) {
             position.set("cfg_" + type + "_" + i, buf.readUnsignedByte());
