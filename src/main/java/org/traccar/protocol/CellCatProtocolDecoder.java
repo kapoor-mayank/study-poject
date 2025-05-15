@@ -143,8 +143,8 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
         long time = buf.readUnsignedInt() * 1000L;
         position.setTime(new Date(time));
 
-        double longitude = buf.readInt() * 1e-7;
-        double latitude = buf.readInt() * 1e-7;
+        position.setLongitude(buf.readInt() * 1e-7);
+        position.setLatitude(buf.readInt() * 1e-7);
         position.setAltitude((double) buf.readShort());
         position.setSpeed(buf.readUnsignedShort() / 100.0); // convert cm/s to m/s if you want
         position.setCourse(buf.readUnsignedShort() * 0.1);
@@ -165,6 +165,8 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
             // GPS fix is valid, so fixTime = device time
             position.setFixTime(position.getDeviceTime());
         }
+
+        LOGGER.info("Position object after decodeGps: {}", position);
 
         return Collections.singletonList(position);
     }
