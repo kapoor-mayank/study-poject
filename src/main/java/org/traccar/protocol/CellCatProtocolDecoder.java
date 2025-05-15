@@ -135,24 +135,40 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
     private List<Position> decodeGps(Channel channel, SocketAddress remoteAddress, ByteBuf buf) {
         DeviceSession deviceSession = getDeviceSession(channel, remoteAddress);
         if (deviceSession == null) return null;
+
         Position position = new Position(getProtocolName());
         position.setDeviceId(deviceSession.getDeviceId());
 
         buf.readerIndex(2);
-        position.setTime(new Date(buf.readUnsignedInt() * 1000L));
-        position.setLongitude(buf.readInt() * 1e-7);
-        position.setLatitude(buf.readInt() * 1e-7);
+        long time = buf.readUnsignedInt() * 1000L;
+        position.setTime(new Date(time));
+
+        double longitude = buf.readInt() * 1e-7;
+        double latitude = buf.readInt() * 1e-7;
         position.setAltitude((double) buf.readShort());
-        position.setSpeed(buf.readUnsignedShort());
+        position.setSpeed(buf.readUnsignedShort() / 100.0); // convert cm/s to m/s if you want
         position.setCourse(buf.readUnsignedShort() * 0.1);
-        position.setValid(buf.readUnsignedByte() >= 2);
+
+        int fix = buf.readUnsignedByte();
+        position.setValid(fix >= 2);
+
         position.set("satellites", buf.readUnsignedByte());
-        buf.skipBytes(1);
+        buf.skipBytes(1); // GPS jam detect (future)
         position.set("hdop", buf.readUnsignedByte() * 0.1);
         position.set("gpsTryCount", buf.readUnsignedByte());
-        LOGGER.info("Position object after decodeGps: {}", position);
+
+        // If GPS fix is invalid, mark outdated and fallback to last known location
+        if (!position.getValid()) {
+            position.setOutdated(true);
+            getLastLocation(position, position.getDeviceTime());
+        } else {
+            // GPS fix is valid, so fixTime = device time
+            position.setFixTime(position.getDeviceTime());
+        }
+
         return Collections.singletonList(position);
     }
+
 
     private List<Position> decodeAlarm(Channel channel, SocketAddress remoteAddress, ByteBuf buf) {
         DeviceSession deviceSession = getDeviceSession(channel, remoteAddress);
