@@ -208,6 +208,7 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
         position.set("batteryLevel", buf.readUnsignedByte());
         position.set("externalVoltage", buf.readUnsignedShort());
         position.set("temperature", buf.readShort() * 0.1);
+        LOGGER.info("Skipping two bytes to read next");
         buf.skipBytes(2);
         position.set("rssi", (double) buf.readShort());
         position.set("aband", buf.readUnsignedByte());
