@@ -36,6 +36,8 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
     public static final int MSG_GEOFENCE_CONFIG = 0xC7;
     public static final int MSG_GEOFENCE_CLEAR = 0xC8;
     public static final int MSG_SESSION_END = 0xFF;
+    private long sessionId = 0;
+
 
     public CellCatProtocolDecoder(Protocol protocol) {
         super(protocol);
@@ -79,6 +81,7 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
                 return decodeDataComplete(channel, remoteAddress, buf);
             case MSG_SESSION_END:
                 LOGGER.info("Session end received from device.");
+                sessionId = 0; // Clear session ID
                 if (channel != null) {
                     channel.close();
                 }
@@ -110,6 +113,10 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
 
         LOGGER.info("Received registration ID in 0x01 command: {}", deviceId);
         getDeviceSession(channel, remoteAddress, deviceId);
+
+
+        //Set new session ID
+        sessionId = System.currentTimeMillis();
 
         if (channel != null) {
             ByteBuf response = Unpooled.buffer(30);
@@ -148,6 +155,8 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
         position.setAltitude((double) buf.readShort());
         position.setSpeed(buf.readUnsignedShort() / 100.0); // convert cm/s to m/s if you want
         position.setCourse(buf.readUnsignedShort() * 0.1);
+        position.set("sessionId", sessionId);
+
 
         int fix = buf.readUnsignedByte();
         position.setValid(fix >= 2);
@@ -178,19 +187,21 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
         Position position = new Position(getProtocolName());
         position.setDeviceId(deviceSession.getDeviceId());
 
-        buf.readerIndex(2);
+        buf.readerIndex(2); // Start at byte 2 (timestamp)
         position.setTime(new Date(buf.readUnsignedInt() * 1000L));
-        buf.skipBytes(5);
-        position.set("relayStatus", buf.readUnsignedByte());
-        position.set("bw1", buf.readUnsignedByte());
-        position.set("bw2", buf.readUnsignedByte());
-        position.set("light", buf.readUnsignedByte());
-        buf.skipBytes(1);
-        position.set("vehicleStopped", buf.readUnsignedByte());
-        position.set("geofence1", buf.readUnsignedByte());
-        position.set("geofence2", buf.readUnsignedByte());
-        position.set("agnss", buf.readUnsignedByte());
-        position.set("rtc", buf.readUnsignedInt() * 1000L);
+        buf.skipBytes(3); // Skip unused bytes 6, 7, 8
+        position.set("sessionId", sessionId);
+        position.set("relayStatus", buf.readUnsignedByte()); // Byte 9
+        position.set("bw1", buf.readUnsignedByte());         // Byte 10
+        position.set("bw2", buf.readUnsignedByte());         // Byte 11
+        position.set("light", buf.readUnsignedByte());       // Byte 12
+        buf.skipBytes(1);                                    // Byte 13 (future)
+        position.set("vehicleStopped", buf.readUnsignedByte()); // Byte 14
+        position.set("geofence1", buf.readUnsignedByte());   // Byte 15
+        position.set("geofence2", buf.readUnsignedByte());   // Byte 16
+        position.set("agnss", buf.readUnsignedByte());       // Byte 17
+        position.set("rtc", buf.readUnsignedInt() * 1000L);  // Bytes 18–21
+
         LOGGER.info("Position object after decodeAlarm: {}", position);
         return Collections.singletonList(position);
     }
@@ -203,6 +214,7 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
         position.setFixTime(new Date());
 
         buf.readerIndex(6);
+        position.set("sessionId", sessionId);
         position.set("packetNumber", buf.readUnsignedShort());
         position.set("batteryVoltage", buf.readUnsignedShort());
         position.set("batteryLevel", buf.readUnsignedByte());
