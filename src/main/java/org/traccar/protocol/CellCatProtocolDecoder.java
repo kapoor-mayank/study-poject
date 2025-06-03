@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 public class CellCatProtocolDecoder extends BaseProtocolDecoder {
 
@@ -116,7 +117,8 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
 
 
         //Set new session ID
-        sessionId = System.currentTimeMillis();
+        sessionId = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
+
 
         if (channel != null) {
             ByteBuf response = Unpooled.buffer(30);
