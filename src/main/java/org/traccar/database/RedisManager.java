@@ -31,6 +31,7 @@ public class RedisManager {
 //        LOGGER.info("RedisManager writePosition");
         String key = "positions." + position.getUniqueId();
         String value = this.objectMapper.writeValueAsString(position);
+        LOGGER.info("Data before being pushed to Redis: {}", value);
         try (Jedis jedis = new Jedis(Context.getConfig().getString("redis.database"))) {
             jedis.lpush(key, new String[]{value});
 
