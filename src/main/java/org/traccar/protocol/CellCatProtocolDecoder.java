@@ -175,11 +175,6 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
             position.setFixTime(position.getDeviceTime());
         }
 
-        LOGGER.info("Device ID: {}", position.getDeviceId());
-        if (deviceSession != null) {
-            LOGGER.info("Unique ID from session: {}", Context.getIdentityManager().getById(position.getDeviceId()).getUniqueId());
-        }
-
         LOGGER.info("Position object after decodeGps: {}", position);
 
         return Collections.singletonList(position);
@@ -206,11 +201,6 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
         position.set("geofence2", buf.readUnsignedByte());   // Byte 16
         position.set("agnss", buf.readUnsignedByte());       // Byte 17
         position.set("rtc", buf.readUnsignedInt() * 1000L);  // Bytes 18–21
-
-        LOGGER.info("Device ID: {}", position.getDeviceId());
-        if (deviceSession != null) {
-            LOGGER.info("Unique ID from session: {}", Context.getIdentityManager().getById(position.getDeviceId()).getUniqueId());
-        }
         LOGGER.info("Position object after decodeAlarm: {}", position);
         return Collections.singletonList(position);
     }
@@ -235,10 +225,6 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
         position.set("aband", buf.readUnsignedByte());
         position.set("earfcn", buf.readUnsignedShort());
         position.set("retryCount", buf.readUnsignedByte());
-        LOGGER.info("Device ID: {}", position.getDeviceId());
-        if (deviceSession != null) {
-            LOGGER.info("Unique ID from session: {}", Context.getIdentityManager().getById(position.getDeviceId()).getUniqueId());
-        }
         LOGGER.info("Position object after decodeStatus: {}", position);
         return Collections.singletonList(position);
     }
