@@ -167,6 +167,7 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
         buf.skipBytes(1); // GPS jam detect (future)
         position.set("hdop", buf.readUnsignedByte() * 0.1);
         position.set("gpsTryCount", buf.readUnsignedByte());
+        position.set("msgType", "decodeGps");
 
         // If GPS fix is invalid, mark outdated and fallback to last known location
         if (!position.getValid()) {
@@ -203,6 +204,7 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
         position.set("geofence2", buf.readUnsignedByte());   // Byte 16
         position.set("agnss", buf.readUnsignedByte());       // Byte 17
         position.set("rtc", buf.readUnsignedInt() * 1000L);  // Bytes 18–21
+        position.set("msgType", "decodeAlarm");
         LOGGER.info("Position object after decodeAlarm: {}", position);
         return Collections.singletonList(position);
     }
@@ -227,6 +229,7 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
         position.set("aband", buf.readUnsignedByte());
         position.set("earfcn", buf.readUnsignedShort());
         position.set("retryCount", buf.readUnsignedByte());
+        position.set("msgType", "decodeStatus");
         LOGGER.info("Position object after decodeStatus: {}", position);
         return Collections.singletonList(position);
     }
