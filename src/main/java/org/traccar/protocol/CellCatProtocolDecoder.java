@@ -114,7 +114,8 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
 
         LOGGER.info("Received registration ID in 0x01 command: {}", deviceId);
         getDeviceSession(channel, remoteAddress, deviceId);
-
+        int sessionType = buf.getUnsignedByte(26);
+        LOGGER.info("Session Type received: {}", sessionType);
 
         //Set new session ID
         sessionId = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;

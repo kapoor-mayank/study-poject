@@ -8,6 +8,7 @@
   <entry key="geocoder.enable">false</entry>
   <entry key="geocoder.type">google</entry>
   <entry key="logger.enable">true</entry>
+  <entry key="logger.console">true</entry>
   <entry key="logger.level">info</entry>
   <entry key="logger.rotate">true</entry>
   <entry key="logger.file">C:/traccar/log/tracker-server.log</entry>

@@ -30,9 +30,9 @@ public class RedisManager {
     public void writePosition(Position position) throws JsonProcessingException {
 //        LOGGER.info("RedisManager writePosition");
         String key;
-//        if(position.getProtocol().equals("cellcat"))
-//            key = "cellcat.positions." + position.getUniqueId();
-//        else
+        if(position.getProtocol().equals("cellcat"))
+            key = "cellcat.positions." + position.getUniqueId();
+        else
             key = "positions." + position.getUniqueId();
         String value = this.objectMapper.writeValueAsString(position);
         try (Jedis jedis = new Jedis(Context.getConfig().getString("redis.database"))) {
