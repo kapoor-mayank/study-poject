@@ -31,7 +31,7 @@ public class RedisManager {
 //        LOGGER.info("RedisManager writePosition");
         String key;
         if(position.getProtocol().equals("cellcat"))
-            key = "cellcat.positions." + position.getUniqueId();
+            key = "cellcat.positions." + position.getUniqueId();    //will generate separate key for cellcat devices
         else
             key = "positions." + position.getUniqueId();
         String value = this.objectMapper.writeValueAsString(position);
