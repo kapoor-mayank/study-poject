@@ -7,6 +7,7 @@ import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.traccar.*;
+import org.traccar.helper.UnitsConverter;
 import org.traccar.model.Position;
 
 import java.net.SocketAddress;
@@ -156,7 +157,7 @@ public class CellCatProtocolDecoder extends BaseProtocolDecoder {
         position.setLongitude(buf.readInt() * 1e-7);
         position.setLatitude(buf.readInt() * 1e-7);
         position.setAltitude((double) buf.readShort());
-        position.setSpeed(buf.readUnsignedShort() / 100.0); // convert cm/s to m/s if you want
+        position.setSpeed(UnitsConverter.knotsFromCps(buf.readUnsignedShort())); // converted speed to knots from cps as in DMT too
         position.setCourse(buf.readUnsignedShort() * 0.1);
         position.set("sessionId", sessionId);
 
