@@ -48,9 +48,16 @@ public class RedisManager {
 //            // Push the data to the stream
 //            jedis.xadd("positions.stream", params, streamData);
 //********************************************************************************************************
-//            Map<String, String> streamData = new HashMap<>();
-//            streamData.put(key, objectMapper.writeValueAsString(Collections.singletonList(position)));
+            //############################################################
+//**************************************SAGAR BHAI CODE***************************************************
+//            /*  B) push to the global stream   */
+//            XAddParams params = XAddParams.xAddParams().id(StreamEntryID.NEW_ENTRY);
 //
+//            Map<String, String> streamData = new HashMap<>();
+//            streamData.put(key, value);    // <-- just the object JSON, no List wrapper
+//
+//            jedis.xadd("positions.stream", params, streamData);
+//********************************************************************************************************
 //// Use "*" to auto-generate the ID for the stream entry
 //            jedis.xadd("positions.stream", "*", streamData);
         }
