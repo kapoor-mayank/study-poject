@@ -32,7 +32,7 @@ import org.traccar.model.WiFiData;
  * The DmtProtocolDecoder class is responsible for decoding and parsing messages
  * from the DMT device protocol. It extends functionality from the base protocol
  * decoder to handle specific DMT protocol message types and formats.
- *
+ * <p>
  * This decoder supports the following message types:
  * - MSG_HELLO
  * - MSG_HELLO_RESPONSE
@@ -44,7 +44,7 @@ import org.traccar.model.WiFiData;
  * - MSG_CANNED_RESPONSE_1
  * - MSG_CANNED_REQUEST_2
  * - MSG_CANNED_RESPONSE_2
- *
+ * <p>
  * The decoding process includes handling fixed 64-bit data record parsing, standard
  * message parsing, processing Wi-Fi data scans, and cell tower scan data interpretation.
  * The decoder interacts with a communication channel, processes incoming data, and
@@ -152,15 +152,11 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
             uniqueId = Context.getIdentityManager().getById(position.getDeviceId()).getUniqueId();
             position.set("index", Long.valueOf(buf.readUnsignedIntLE()));
             sequenceNo = (Long) position.getAttributes().get("index");
-//            LOGGER.info("DeviceId: {}, UniqueId: {}, Sequence Number: {}", position.getDeviceId(), uniqueId, sequenceNo);
             position.setDeviceTime(new Date(1356998400000L + buf.readUnsignedIntLE() * 1000L));
-
-//            LOGGER.info("Position After Population :: {}", position);
 
             int event = buf.readUnsignedByte();
             if (event == 11) position.setDeviceTime(new Date());
             position.set("event", Integer.valueOf(event));
-//            LOGGER.info("DmtProtocolDecoder - The value of event is: {}, multipying it by 2: {}", Integer.valueOf(event), 2 * Integer.valueOf(event));
             while (buf.readerIndex() < recordEnd) {
                 int fieldId = buf.readUnsignedByte();
 //                LOGGER.info("Field ID: {}", fieldId);
@@ -218,7 +214,7 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
                     //In JavaScript Decoder WiFi Data is parsed when fieldID == 25
                     List<WiFiData> wifiDatas = parseWiFiDataScan(buf, fieldLength);
                     LOGGER.info("Inside WiFi Case 25");
-                    if(!wifiDatas.isEmpty())
+                    if (!wifiDatas.isEmpty())
                         position.set("wifiData", wifiDatas.toString());
                 } else if (fieldId == 26) {
                     position.set("tripOdometer", Long.valueOf(buf.readUnsignedIntLE()));
@@ -227,15 +223,21 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
                     position.set("odometer", Long.valueOf(buf.readUnsignedIntLE()));
                     position.set("hours", Long.valueOf(buf.readUnsignedIntLE() * 1000L));
                 } else if (fieldId == 28) {
-                    LOGGER.info("Inside CellTower Case 36");
+                    LOGGER.info("Inside CellTower Case 28");
                     List<Map<String, Object>> cellTowers = parseCellTowerScan(buf, fieldLength);
-                    LOGGER.info("Decoded CellTower Case 36: {}", cellTowers.toString());
+                    LOGGER.info("Decoded CellTower Case 28: {}", cellTowers.toString());
                     position.set("cellTowers", cellTowers.toString());
-                } else if (fieldId == 36) {
+                } else if (fieldId == 33) {
                     LOGGER.info("Inside CellTower Case 33");
                     Map<String, Object> detailedTower = parseDetailedCellTowerScan(buf, fieldLength);
                     LOGGER.info("Decoded CellTower Case 33: {}", detailedTower.toString());
                     position.set("detailedTower", detailedTower.toString());
+                } else if (fieldId == 36) {
+                    LOGGER.info("Inside CellTower Case 36");
+                    LOGGER.info("Field ID: {}, Field Length: {}", fieldId, fieldLength);
+                    Map<String, Object> multiTower = parseMultiCellTowerScan(buf.readSlice(fieldLength));
+                    LOGGER.info("Decoded CellTower Case 36: {}", multiTower.toString());
+                    position.set("multiTower", multiTower.toString());
                 }
 
                 buf.readerIndex(fieldEnd);
@@ -268,17 +270,6 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
 
         ByteBuf buf = (ByteBuf) msg;
         String hexData = ByteBufUtil.hexDump(buf);
-//        LOGGER.info("The HEX received is :: {}", ByteBufUtil.hexDump(buf));
-//        assert buf == null : "Byte Buffer ids null";
-//
-//        ByteBuffer byteBuffer = ByteBuffer.wrap(buf.array());
-//        AtomicInteger atomicInteger = new AtomicInteger(BigInteger.ONE.intValue());
-//
-//        Stream.generate(byteBuffer::get)
-//                .limit(byteBuffer.capacity())
-//                .forEachOrdered(byteData -> {
-//                    LOGGER.info("Byte {} :: {}", atomicInteger.getAndIncrement(), String.format("%8s", Integer.toBinaryString(byteData & 0xFF)).replace(' ', '0'));
-//                });
         buf.skipBytes(2);
         int type = buf.readUnsignedByte();
 //        LOGGER.info("Type :: {}", type);
@@ -350,6 +341,7 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
 
         return wiFiDatas;
     }
+
     /**
      * Converts an unsigned byte value to its signed equivalent.
      * Values > 127 are adjusted to the range -128 to -1.
@@ -357,6 +349,7 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
     private int unsignedToSigned(int unsignedValue) {
         return unsignedValue > 127 ? unsignedValue - 256 : unsignedValue;
     }
+
     private List<Map<String, Object>> parseCellTowerScan(ByteBuf buf, int length) {
         List<Map<String, Object>> cellTowers = new LinkedList<>();
         int dataFieldLength = 10; // Fixed length for each tower entry
@@ -375,6 +368,7 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
         }
         return cellTowers;
     }
+
     private Map<String, Object> parseDetailedCellTowerScan(ByteBuf buf, int length) {
         Map<String, Object> detailedTower = new HashMap<>();
 
@@ -383,12 +377,12 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
         buf.skipBytes(1); // Skip reserved bits
 
         detailedTower.put("cellId", buf.readUnsignedIntLE());
-        LOGGER.info("CellID: {}",detailedTower.get("cellId"));
+        LOGGER.info("CellID: {}", detailedTower.get("cellId"));
         detailedTower.put("locationAreaCode", buf.readUnsignedShortLE());
         detailedTower.put("mobileCountryCode", buf.readUnsignedShortLE());
         detailedTower.put("mobileNetworkCode", buf.readUnsignedShortLE());
         detailedTower.put("timingAdvance", buf.readUnsignedShortLE());
-        
+
         List<Map<String, Object>> towerData = new LinkedList<>();
         while (buf.readableBytes() >= towerLength) {
             Map<String, Object> tower = new HashMap<>();
@@ -403,6 +397,134 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
         detailedTower.put("towerData", towerData);
 
         return detailedTower;
+    }
+
+    private Map<String, Object> parseMultiCellTowerScan(ByteBuf buf) {
+        Map<String, Object> multiTower = new HashMap<>();
+
+
+        List<Map<String, Object>> towerDataList = new LinkedList<>();
+
+        int towerFieldLength = buf.readUnsignedByte(); // First byte
+        int startIndex = buf.readerIndex();
+        int endIndex = buf.writerIndex(); // Use writerIndex since it's a slice
+
+        while (buf.readerIndex() + towerFieldLength <= endIndex) {
+            int towerStart = buf.readerIndex();
+            LOGGER.info("Parsing tower at byte index {}", buf.readerIndex());
+            Map<String, Object> tower = new HashMap<>();
+
+            int validFlags1 = buf.readUnsignedByte(); // byte 0
+            int validFlags2 = buf.readUnsignedByte(); // byte 1
+            int ratType = (validFlags2 >> 4) & 0x0F;
+
+            tower.put("validFlagCellId", (validFlags1 & 0x01) != 0);
+            tower.put("validFlagLac", (validFlags1 & 0x02) != 0);
+            tower.put("validFlagMccMnc", (validFlags1 & 0x04) != 0);
+            tower.put("validFlagTimingAdvance", (validFlags1 & 0x08) != 0);
+            tower.put("validFlagRsrp", (validFlags1 & 0x10) != 0);
+            tower.put("validFlagRsrq", (validFlags1 & 0x20) != 0);
+            tower.put("validFlagEarfcn", (validFlags1 & 0x40) != 0);
+            tower.put("validFlagPhysicalCellId", (validFlags1 & 0x80) != 0);
+            tower.put("validFlagTimingDiff", (validFlags2 & 0x01) != 0);
+            tower.put("isServingCell", (validFlags2 & 0x02) != 0);
+
+            switch (ratType) {
+                case 0:
+                    tower.put("ratType", "0: CAT-M1");
+                    break;
+                case 1:
+                    tower.put("ratType", "1: NB-IoT");
+                    break;
+                case 2:
+                    tower.put("ratType", "2: GSM");
+                    break;
+                case 3:
+                    tower.put("ratType", "3: UMTS");
+                    break;
+                case 4:
+                    tower.put("ratType", "4: LTE");
+                    break;
+                default:
+                    tower.put("ratType", ratType);
+                    break;
+            }
+
+            if ((validFlags1 & 0x01) != 0) {
+                tower.put("cellId", buf.readUnsignedIntLE());
+            } else {
+                buf.skipBytes(4);
+            }
+
+            if ((validFlags1 & 0x02) != 0) {
+                tower.put("lac", buf.readUnsignedShortLE());
+            } else {
+                buf.skipBytes(2);
+            }
+
+            if ((validFlags1 & 0x04) != 0) {
+                tower.put("mcc", buf.readUnsignedShortLE());
+                tower.put("mnc", buf.readUnsignedShortLE());
+            } else {
+                buf.skipBytes(4);
+            }
+
+            if ((validFlags1 & 0x08) != 0) {
+                tower.put("timingAdvance", buf.readUnsignedShortLE());
+            } else {
+                buf.skipBytes(2);
+            }
+
+            if ((validFlags1 & 0x10) != 0) {
+                tower.put("rsrp", buf.readShortLE());
+            } else {
+                buf.skipBytes(2);
+            }
+
+            if ((validFlags1 & 0x20) != 0) {
+                tower.put("rsrq", (int) buf.readByte());
+            } else {
+                buf.skipBytes(1);
+            }
+
+            if ((validFlags1 & 0x40) != 0) {
+                int earfcn = (buf.readUnsignedByte() & 0xFF)
+                        | ((buf.readUnsignedByte() & 0xFF) << 8)
+                        | ((buf.readUnsignedByte() & 0xFF) << 16);
+                tower.put("downlinkEARFCN", earfcn);
+            } else {
+                buf.skipBytes(3);
+            }
+
+            if ((validFlags1 & 0x80) != 0) {
+                tower.put("physicalCellId", buf.readUnsignedShortLE());
+            } else {
+                buf.skipBytes(2);
+            }
+
+            if ((validFlags2 & 0x01) != 0) {
+                tower.put("timingDifference", buf.readIntLE());
+            } else {
+                buf.skipBytes(4);
+            }
+
+            // Ensure proper alignment: skip over unprocessed bytes if field logic missed anything
+//            int bytesRead = buf.readerIndex() - towerStart;
+//            if (bytesRead < towerFieldLength) {
+//                buf.skipBytes(towerFieldLength - bytesRead);
+//            } else if (bytesRead > towerFieldLength) {
+//                // In case we accidentally over-read (should not happen), reset to expected position
+//                buf.readerIndex(towerStart + towerFieldLength);
+//            }
+
+            towerDataList.add(tower);
+            LOGGER.info("Finished parsing towers, total parsed: {}", towerDataList.size());
+
+        }
+
+        multiTower.put("towerFieldLength", towerFieldLength);
+        multiTower.put("towerData", towerDataList);
+        return multiTower;
     }
 
 }
