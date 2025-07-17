@@ -508,7 +508,7 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
                 buf.skipBytes(4);
             }
 
-            // Ensure proper alignment: skip over unprocessed bytes if field logic missed anything
+            // Ensure proper alignment: skip over unprocessed bytes if field logic missed anything not required after debugging
 //            int bytesRead = buf.readerIndex() - towerStart;
 //            if (bytesRead < towerFieldLength) {
 //                buf.skipBytes(towerFieldLength - bytesRead);
