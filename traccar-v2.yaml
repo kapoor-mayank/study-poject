@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traccar-app
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: traccar
+  template:
+    metadata:
+      labels:
+        app: traccar
+    spec:
+      # Removed hostNetwork: true
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+        - name: ecr-regcred
+      containers:
+        - name: traccar
+          image: 241122888644.dkr.ecr.us-east-1.amazonaws.com/ensurity-dev/traccar:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8083
+              hostPort: 8083  # Bind only required port to host
+          volumeMounts:
+            - name: logs-volume
+              mountPath: /app/logs
+      volumes:
+        - name: logs-volume
+          hostPath:
+            path: /home/ubuntu/trax-java/logs
+            type: Directory
+

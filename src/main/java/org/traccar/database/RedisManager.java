@@ -11,8 +11,8 @@ import org.traccar.Context;
 import org.traccar.model.Device;
 import org.traccar.model.Position;
 import redis.clients.jedis.Jedis;
-//import redis.clients.jedis.StreamEntryID;
-//import redis.clients.jedis.params.XAddParams;
+import redis.clients.jedis.StreamEntryID;
+import redis.clients.jedis.params.XAddParams;
 
 
 public class RedisManager {
@@ -51,12 +51,12 @@ public class RedisManager {
             //############################################################
 //**************************************SAGAR BHAI CODE***************************************************
             /*  B) push to the global stream   */
-//            XAddParams params = XAddParams.xAddParams().id(StreamEntryID.NEW_ENTRY);
-//
-//            Map<String, String> streamData = new HashMap<>();
-//            streamData.put(key, value);    // <-- just the object JSON, no List wrapper
-//
-//            jedis.xadd("positions.stream", params, streamData);
+            XAddParams params = XAddParams.xAddParams().id(StreamEntryID.NEW_ENTRY);
+
+            Map<String, String> streamData = new HashMap<>();
+            streamData.put(key, value);    // <-- just the object JSON, no List wrapper
+
+            jedis.xadd("positions.stream", params, streamData);
 //********************************************************************************************************
 //// Use "*" to auto-generate the ID for the stream entry
 //            jedis.xadd("positions.stream", "*", streamData);

@@ -188,6 +188,17 @@ public class DmtProtocolDecoder extends BaseProtocolDecoder {
                         position.set("in" + i, Boolean.valueOf(BitUtil.check(input, i)));
                     position.set("output", Integer.valueOf(output));
                     position.set("status", Integer.valueOf(status));
+//                    position.set("tripStatus", BitUtil.check(status, 0));               // b0
+//                    position.set("internalBatteryGood", BitUtil.check(status, 1));      // b1
+//                    position.set("externalPowerGood", BitUtil.check(status, 2));        // b2
+//                    position.set("gsmConnected", BitUtil.check(status, 3));             // b3
+//                    position.set("shuntingFromBattery", BitUtil.check(status, 4));      // b4
+//                    position.set("externalPowerEnabled", BitUtil.check(status, 5));     // b5
+//                    position.set("magnetAbsent", BitUtil.check(status, 6));             // b6
+//                    position.set("recoveryMode", BitUtil.check(status, 7));             // b7
+//                    for (int i = 8; i < 16; i++) {
+//                        position.set("deviceStatusBit" + i, BitUtil.check(status, i));
+//                    }
                 } else if (fieldId == 6) {
                     while (buf.readerIndex() < fieldEnd) {
                         int number = buf.readUnsignedByte();
